@@ -1,1 +1,1 @@
-# Efficient-Semantic-Segmentation-for-Self-Driving-Cars-A-Lightweight-Model-for-Driveable-Area-and-La
+# Efficient-Semantic-Segmentation-for-Self-Driving-Cars
