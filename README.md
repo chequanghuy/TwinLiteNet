@@ -1,14 +1,15 @@
 # Efficient-Semantic-Segmentation-for-Self-Driving-Cars
 
-```python
-|─data
-| |─bdd100k   # inference images
-| | |-train
-| | |-val
-| |─bdd_lane_gt   # inference images
-| | |-train
-| | |-val
-| |─bdd_seg_gt   # inference images
-| | |-train
-| | |-val
+```bash
+/data
+    bdd100k
+        train/
+        val/
+    bdd_lane_gt
+        train/
+        val/
+    bdd_seg_gt
+        train/
+        val/
 ```
+
