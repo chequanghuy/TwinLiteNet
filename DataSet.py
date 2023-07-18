@@ -6,7 +6,6 @@ import numpy as np
 import os
 import random
 import math
-__author__ = "Sachin Mehta"
 
 def augment_hsv(img, hgain=0.015, sgain=0.7, vgain=0.4):
     """change color hue, saturation, value"""
@@ -77,20 +76,25 @@ class MyDataset(torch.utils.data.Dataset):
     '''
     Class to load the dataset
     '''
-    def __init__(self, imList, labelList, transform=None,valid=False):
+    def __init__(self, transform=None,valid=False):
         '''
         :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
         :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
         :param transform: Type of transformation. SEe Transforms.py for supported transformations
         '''
-        self.imList = imList
-        self.labelList = labelList
+
         self.transform = transform
         self.Tensor = transforms.ToTensor()
         self.valid=valid
+        if valid:
+            self.root='/home/ceec/huycq/data/bdd100k/images/val'
+            self.names=os.listdir(self.root)
+        else:
+            self.root='/home/ceec/huycq/data/bdd100k/images/train'
+            self.names=os.listdir(self.root)
 
     def __len__(self):
-        return len(self.imList)
+        return len(self.names)
 
     def __getitem__(self, idx):
         '''
@@ -100,12 +104,11 @@ class MyDataset(torch.utils.data.Dataset):
         '''
         W_=640
         H_=360
-        image_name = self.imList[idx]
-        label_name = self.labelList[idx]
-        label_path=label_name.replace("segments","labels").replace("png","txt")
+        image_name=os.path.join(self.root,self.names[idx])
+        
         image = cv2.imread(image_name)
-        label1 = cv2.imread(label_name, 0)
-        label2 = cv2.imread(label_name.replace("segments","lane"), 0)
+        label1 = cv2.imread(image_name.replace("images","segments").replace("jpg","png"), 0)
+        label2 = cv2.imread(image_name.replace("images","lane").replace("jpg","png"), 0)
         if not self.valid:
             if random.random()<0.5:
                 combination = (image, label1, label2)
@@ -122,27 +125,16 @@ class MyDataset(torch.utils.data.Dataset):
                 image = np.fliplr(image)
                 label1 = np.fliplr(label1)
                 label2 = np.fliplr(label2)
-        
-        # if self.transform:
-        #     [image, label] = self.transform(image, label)
-        image = cv2.resize(image, (W_, H_))
+            
         label1 = cv2.resize(label1, (W_, H_))
         label2 = cv2.resize(label2, (W_, H_))
-        # cv2.imwrite('img.jpg',image)
-        # cv2.imwrite('label1.jpg',label1)
-        # cv2.imwrite('label2.jpg',label2)
+        image = cv2.resize(image, (W_, H_))
+
         _,seg_b1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY_INV)
         _,seg_b2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY_INV)
         _,seg1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY)
         _,seg2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY)
-        
-        # seg_b = cv2.bitwise_and(seg_b1, seg_b2)
-        # seg1 = self.Tensor(seg1)
-        # seg2 = self.Tensor(seg2)
-        # seg_b = self.Tensor(seg_b)
-        # seg_da = torch.stack((seg_b[0], seg1[0],seg2[0]),0)
-        # image = image[:, :, ::-1].transpose(2, 0, 1)
-        # image = np.ascontiguousarray(image)
+
         seg1 = self.Tensor(seg1)
         seg2 = self.Tensor(seg2)
         seg_b1 = self.Tensor(seg_b1)
@@ -156,4 +148,6 @@ class MyDataset(torch.utils.data.Dataset):
        
         return image_name,torch.from_numpy(image),(seg_da,seg_ll)
     
+
+
 

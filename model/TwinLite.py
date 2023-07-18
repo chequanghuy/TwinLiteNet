@@ -1,11 +1,8 @@
 import torch
 import torch.nn as nn
-# import antialiased_cnns
-# from custom_layers import DetectHead, SPP
-import random
 
-from torch.nn import Module, Sequential, Conv2d, ReLU,AdaptiveMaxPool2d, AdaptiveAvgPool2d, \
-    NLLLoss, BCELoss, CrossEntropyLoss, AvgPool2d, MaxPool2d, Parameter, Linear, Sigmoid, Softmax, Dropout, Embedding
+
+from torch.nn import Module, Conv2d, Parameter, Softmax
 
 class PAM_Module(Module):
     """ Position attention module"""
@@ -358,13 +355,12 @@ class InputProjectionA(nn.Module):
         for pool in self.pool:
             input = pool(input)
         return input
-from crfseg import CRF
 
 class ESPNet_Encoder(nn.Module):
     '''
     This class defines the ESPNet-C network in the paper
     '''
-    def __init__(self, classes=20, p=5, q=3):
+    def __init__(self, p=5, q=3):
     # def __init__(self, classes=20, p=1, q=1):
         '''
         :param classes: number of classes in the dataset. Default is 20 for the cityscapes
@@ -406,7 +402,6 @@ class ESPNet_Encoder(nn.Module):
         inp2 = self.sample2(input)
 
         output0_cat = self.b1(torch.cat([output0, inp1], 1))
-        # print(output0_cat.size(),torch.cat([output0, inp1], 1).size())
         output1_0 = self.level2_0(output0_cat) # down-sampled
         
         for i, layer in enumerate(self.level2):
@@ -416,9 +411,7 @@ class ESPNet_Encoder(nn.Module):
                 output1 = layer(output1)
 
         output1_cat = self.b2(torch.cat([output1,  output1_0, inp2], 1))
-        # print("output1_cat 1 :",output1_cat.size())
         output2_0 = self.level3_0(output1_cat) # down-sampled
-        # output2_0=self.mixstyle(output2_0)
         for i, layer in enumerate(self.level3):
             if i==0:
                 output2 = layer(output2_0)
@@ -427,111 +420,24 @@ class ESPNet_Encoder(nn.Module):
         cat_=torch.cat([output2_0, output2], 1)
 
         output2_cat = self.b3(cat_)
-        # classifier = self.classifier(output2_cat)
         out_sa=self.sa(output2_cat)
         out_sa=self.conv_sa(out_sa)
         out_sc=self.sc(output2_cat)
         out_sc=self.conv_sc(out_sc)
         out_s=out_sa+out_sc
-        # print(out_sa.size(),out_sc.size(),out_s.size())
         classifier = self.classifier(out_s)
 
         return classifier
-# class ESPNet_Encoder(nn.Module):
-#     '''
-#     This class defines the ESPNet-C network in the paper
-#     '''
-#     def __init__(self, classes=20, p=5, q=3):
-#         '''
-#         :param classes: number of classes in the dataset. Default is 20 for the cityscapes
-#         :param p: depth multiplier
-#         :param q: depth multiplier
-#         '''
-#         super().__init__()
-#         self.level1 = CBR(3, 16, 3, 2)
-#         self.sample1 = InputProjectionA(1)
-#         self.sample2 = InputProjectionA(2)
 
-#         self.b1 = CBR(16 + 3,19,3)
-#         self.level2_0 = DownSamplerB(16 +3, 64)
-
-#         self.level2 = nn.ModuleList()
-#         for i in range(0, p):
-#             self.level2.append(DilatedParllelResidualBlockB(64 , 64))
-#         self.b2 = CBR(128 + 3,131,3)
-
-#         self.level3_0 = DownSamplerB(128 + 3, 128)
-#         self.level3 = nn.ModuleList()
-#         for i in range(0, q):
-#             self.level3.append(DilatedParllelResidualBlockB(128 , 128))
-#         # self.mixstyle = MixStyle2(p=0.5, alpha=0.1)
-#         self.b3 = CBR(256,32,3)
-#         self.sa = PAM_Module(32)
-#         self.sc = CAM_Module(32)
-#         self.conv_sa = CBR(32,32,3)
-#         self.conv_sc = CBR(32,32,3)
-#         self.classifier = CBR(64, 32, 1, 1)
-
-#     def forward(self, input):
-#         '''
-#         :param input: Receives the input RGB image
-#         :return: the transformed feature map with spatial dimensions 1/8th of the input image
-#         '''
-#         output0 = self.level1(input)
-#         inp1 = self.sample1(input)
-#         inp2 = self.sample2(input)
-
-#         output0_cat = self.b1(torch.cat([output0, inp1], 1))
-#         # print(output0_cat.size(),torch.cat([output0, inp1], 1).size())
-#         output1_0 = self.level2_0(output0_cat) # down-sampled
-        
-#         for i, layer in enumerate(self.level2):
-#             if i==0:
-#                 output1 = layer(output1_0)
-#             else:
-#                 output1 = layer(output1)
-
-#         output1_cat = self.b2(torch.cat([output1,  output1_0, inp2], 1))
-#         # print("output1_cat 1 :",output1_cat.size())
-#         output2_0 = self.level3_0(output1_cat) # down-sampled
-#         # output2_0=self.mixstyle(output2_0)
-#         for i, layer in enumerate(self.level3):
-#             if i==0:
-#                 output2 = layer(output2_0)
-#             else:
-#                 output2 = layer(output2)
-#         cat_=torch.cat([output2_0, output2], 1)
-
-#         output2_cat = self.b3(cat_)
-#         # classifier = self.classifier(output2_cat)
-#         out_sa=self.sa(output2_cat)
-#         out_sa=self.conv_sa(out_sa)
-#         out_sc=self.sc(output2_cat)
-#         out_sc=self.conv_sc(out_sc)
-#         # out_s=out_sa+out_sc
-#         out_s=torch.cat([out_sa,out_sc], 1)
-#         # print(out_sa.size(),out_sc.size(),out_s.size())
-#         classifier = self.classifier(out_s)
-
-#         return classifier
-class ESPNet(nn.Module):
+class TwinLiteNet(nn.Module):
     '''
     This class defines the ESPNet network
     '''
 
-    def __init__(self, classes=20, p=2, q=3, encoderFile=None):
-    # def __init__(self, classes=20, p=1, q=1, enscoderFile=None):
-        '''
-        :param classes: number of classes in the dataset. Default is 20 for the cityscapes
-        :param p: depth multiplier
-        :param q: depth multiplier
-        :param encoderFile: pretrained encoder weights. Recall that we first trained the ESPNet-C and then attached the
-                            RUM-based light weight decoder. See paper for more details.
-        '''
-        super().__init__()
-        self.encoder = ESPNet_Encoder(classes, p, q)
+    def __init__(self, p=2, q=3, ):
 
-        # self.up_l3 = nn.Sequential(nn.ConvTranspose2d(classes, classes, 2, stride=2, padding=0, output_padding=0, bias=False))
+        super().__init__()
+        self.encoder = ESPNet_Encoder(p, q)
 
         self.up_1_1 = UPx2(32,16)
         self.up_2_1 = UPx2(16,8)
@@ -542,32 +448,20 @@ class ESPNet(nn.Module):
         self.classifier_1 = UPx2(8,2)
         self.classifier_2 = UPx2(8,2)
 
-        # self.crf64=CRF(2)
-        # self.crf16=CRF(2)
-        # self.crf2=CRF(2)
 
 
     def forward(self, input):
-        '''
-        :param input: RGB image
-        :return: transformed feature map
-        '''
+
         x=self.encoder(input)
         x1=self.up_1_1(x)
-        # x1=self.crf64(x1)
         x1=self.up_2_1(x1)
-        # x1=self.crf16(x1)
         classifier1=self.classifier_1(x1)
-        # classifier1=self.crf2(classifier1)
         
         
 
         x2=self.up_1_2(x)
-        # x2=self.crf64(x2)
         x2=self.up_2_2(x2)
-        # x2=self.crf16(x2)
         classifier2=self.classifier_2(x2)
-        # classifier2=self.crf2(classifier2)
 
         return (classifier1,classifier2)
 

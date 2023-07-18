@@ -1,23 +1,15 @@
-#============================================
-__author__ = "Sachin Mehta"
-__license__ = "MIT"
-__maintainer__ = "Sachin Mehta"
-#============================================
-from IOUEval import iouEval
-import time
+
 import torch
 import numpy as np
-from IOUEval import iouEval,SegmentationMetric
+from IOUEval import SegmentationMetric
 import logging
 import logging.config
 from tqdm import tqdm
 import os
-import argparse
-from argparse import ArgumentParser
-from utils import smp_metrics
-from utils.constants import *
-# import sys
-# sys.append('/home/ceec/huycq/FastestDet/module/')
+import torch.nn as nn
+from const import *
+
+
 LOGGING_NAME="custom"
 def set_logging(name=LOGGING_NAME, verbose=True):
     # sets up logging for the given name
@@ -70,13 +62,12 @@ def poly_lr_scheduler(args, optimizer, epoch, power=2):
 
 def train(args, train_loader, model, criterion, optimizer, epoch):
     model.train()
-    epoch_loss = [0.1,0.3]
 
     total_batches = len(train_loader)
-    # pbar = enumerate(train_loader)
-    # LOGGER.info(('\n' + '%11s' * 4) % ('Epoch','LOSS1','LOSS2' ,'LOSS'))
-    # pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
-    for i, (_,input, target) in enumerate(train_loader):
+    pbar = enumerate(train_loader)
+    LOGGER.info(('\n' + '%13s' * 4) % ('Epoch','TverskyLoss','FocalLoss' ,'TotalLoss'))
+    pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
+    for i, (_,input, target) in pbar:
         if args.onGPU == True:
             input = input.cuda().float() / 255.0        
         output = model(input)
@@ -84,21 +75,15 @@ def train(args, train_loader, model, criterion, optimizer, epoch):
         # target=target.cuda()
         optimizer.zero_grad()
 
-        loss1,loss2,loss = criterion(output,target)
+        focal_loss,tversky_loss,loss = criterion(output,target)
 
 
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        # pbar.set_description(('%11s' * 1 + '%11.4g' * 3) %
-        #                              (f'{epoch}/{300 - 1}', loss1, loss2, loss.item()))
+        pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
+                                     (f'{epoch}/{300 - 1}', tversky_loss, focal_loss, loss.item()))
 
-
-
-
-    average_epoch_loss_train = sum(epoch_loss) / len(epoch_loss)
-
-    return average_epoch_loss_train
 
 @torch.no_grad()
 def val(val_loader, model):
@@ -111,7 +96,7 @@ def val(val_loader, model):
     '''
     #switch to evaluation mode
     model.eval()
-
+    # crf2=CRF(2)
     # iouEvalVal = iouEval(args.classes)
 
     DA=SegmentationMetric(2)
@@ -183,86 +168,9 @@ def val(val_loader, model):
 
 
 
-# @torch.no_grad()
-# def val(val_loader, model):
-#     seg_list=["DA","LL"]
-#     ncs = 3
-#     seen = 0
-#     s_seg = ' ' * (15 + 11 * 8)
-#     s=""
-#     for i in range(len(seg_list)):
-#         s_seg += '%-33s' % seg_list[i]
-#         s += ('%-11s' * 3) % ('mIoU', 'IoU', 'Acc')
-#     iou_ls = [[] for _ in range(ncs)]
-#     acc_ls = [[] for _ in range(ncs)]
-
-#     total_batches = len(val_loader)
-#     pbar = enumerate(val_loader)
-#     pbar = tqdm(pbar, total=total_batches)
-#     for i, (image_name,input, target) in pbar:
-#         target=target.cuda()
-#         input = input.cuda().float() / 255.0
-
-#         input_var = input
-#         with torch.no_grad():
-#             segmentation = model(input_var)
-
-#         segmentation = segmentation.log_softmax(dim=1).exp()
-#         _, segmentation = torch.max(segmentation, 1)  # (bs, C, H, W) -> (bs, H, W)
-#         _,target= torch.max(target, 1)
-        
-#         tp_seg, fp_seg, fn_seg, tn_seg = smp_metrics.get_stats(segmentation, target, mode="multiclass",
-#                                                                 threshold=None,
-#                                                                 num_classes=ncs)
-#         iou = smp_metrics.iou_score(tp_seg, fp_seg, fn_seg, tn_seg, reduction='none')
-#         #         print(iou)
-#         acc = smp_metrics.balanced_accuracy(tp_seg, fp_seg, fn_seg, tn_seg, reduction='none')
-#         # print(iou)
-#         for i in range(ncs):
-#             iou_ls[i].append(iou.T[i].detach().cpu().numpy())
-#             acc_ls[i].append(acc.T[i].detach().cpu().numpy())
-
-        
-
-
-#     for i in range(ncs):
-#         iou_ls[i] = np.concatenate(iou_ls[i])
-#         acc_ls[i] = np.concatenate(acc_ls[i])
-#     # print(len(iou_ls[0]))
-#     iou_score = np.mean(iou_ls)
-#     # print(iou_score)
-#     acc_score = np.mean(acc_ls)
-
-#     miou_ls = []
-#     for i in range(len(seg_list)):
-#         miou_ls.append(np.mean( (iou_ls[0] + iou_ls[i+1]) / 2))
-
-#     for i in range(ncs):
-#         iou_ls[i] = np.mean(iou_ls[i])
-#         acc_ls[i] = np.mean(acc_ls[i])
-
-
-#     print(s_seg)
-#     print(s)
-#     pf = ('%-11.3g' * 2) % (iou_score, acc_score)
-#     for i in range(len(seg_list)):
-#         tmp = i+1
-#         pf += ('%-11.3g' * 3) % (miou_ls[i], iou_ls[tmp], acc_ls[tmp])
-#     print(pf)
 
 def save_checkpoint(state, filenameCheckpoint='checkpoint.pth.tar'):
-    '''
-    helper function to save the checkpoint
-    :param state: model state
-    :param filenameCheckpoint: where to save the checkpoint
-    :return: nothing
-    '''
     torch.save(state, filenameCheckpoint)
 
 def netParams(model):
-    '''
-    helper function to see total network parameters
-    :param model: model
-    :return: total network parameters
-    '''
     return np.sum([np.prod(parameter.size()) for parameter in model.parameters()])
