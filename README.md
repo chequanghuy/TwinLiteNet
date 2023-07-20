@@ -29,29 +29,29 @@ pip install -r requirements.txt
             train/
             val/
 ```
-# Pipeline
+## Pipeline
 
 <div align=center>
 <img src='image\arch.png' width='600'>
 </div>
 
-# Train
+## Train
 ```python
 python3 main.py
 ```
 
-# Test
+## Test
 ```python
 python3 val.py
 ```
 
-# Inference
+## Inference
 
-## Images
+### Images
 ```python
 python3 test_image.py
 ```
-## Video
+### Video
 ```python
 python3 test_video.py
 ```
