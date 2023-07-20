@@ -40,6 +40,11 @@ pip install -r requirements.txt
 python3 main.py
 ```
 
+# Test
+```python
+python3 val.py
+```
+
 # Inference
 
 ## Images
