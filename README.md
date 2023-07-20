@@ -10,8 +10,6 @@ pip install -r requirements.txt
 
 ## Data Preparation
 
-### Download
-
 - Download the images from [images](https://bdd-data.berkeley.edu/).
 
 - Download the annotations of drivable area segmentation from [segments](https://drive.google.com/file/d/1xy_DhUZRHR8yrZG3OwTQAHhYTnXn7URv/view?usp=sharing). 
