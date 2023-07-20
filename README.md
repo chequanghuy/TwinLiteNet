@@ -1,5 +1,13 @@
 # Efficient-Semantic-Segmentation-for-Self-Driving-Cars
 
+## Requirement
+See `requirements.txt` for additional dependencies and version requirements.
+
+```setup
+pip install -r requirements.txt
+```
+
+
 ## Data Preparation
 
 ### Download
