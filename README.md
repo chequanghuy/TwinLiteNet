@@ -55,3 +55,8 @@ python3 test_image.py
 ```python
 python3 test_video.py
 ```
+
+## Acknowledgement
+Our source code is inspired by:
+- [ESPNet](https://github.com/sacmehta/ESPNet)
+- [YOLOP](https://github.com/hustvl/YOLOP)
