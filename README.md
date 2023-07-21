@@ -60,3 +60,19 @@ python3 test_video.py
 Our source code is inspired by:
 - [ESPNet](https://github.com/sacmehta/ESPNet)
 - [YOLOP](https://github.com/hustvl/YOLOP)
+
+
+
+## Citation
+
+If you find our paper and code useful for your research, please consider giving a star :star:   and citation :pencil: :
+
+```BibTeX
+@misc{che2023twinlitenet,
+      title={TwinLiteNet: An Efficient and Lightweight Model for Driveable Area and Lane Segmentation in Self-Driving Cars}, 
+      author={Quang Huy Che and Dinh Phuc Nguyen and Minh Quan Pham and Duc Khai Lam},
+      year={2023},
+      eprint={2307.10705},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
