@@ -1,4 +1,4 @@
-# Efficient-Semantic-Segmentation-for-Self-Driving-Cars
+# TwinLiteNet: An Efficient and Lightweight Model for Driveable Area and Lane Segmentation in Self-Driving Cars
 
 ## Requirement
 See `requirements.txt` for additional dependencies and version requirements.
