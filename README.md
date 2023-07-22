@@ -52,10 +52,7 @@ python3 val.py
 ```python
 python3 test_image.py
 ```
-### Video
-```python
-python3 test_video.py
-```
+
 
 ## Acknowledgement
 Our source code is inspired by:
