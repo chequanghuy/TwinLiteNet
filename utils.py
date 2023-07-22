@@ -83,26 +83,39 @@ def train(args, train_loader, model, criterion, optimizer, epoch):
         optimizer.step()
         pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
                                      (f'{epoch}/{300 - 1}', tversky_loss, focal_loss, loss.item()))
+        
+
+def train16fp(args, train_loader, model, criterion, optimizer, epoch,scaler):
+    model.train()
+    print("16fp-------------------")
+    total_batches = len(train_loader)
+    pbar = enumerate(train_loader)
+    LOGGER.info(('\n' + '%13s' * 4) % ('Epoch','TverskyLoss','FocalLoss' ,'TotalLoss'))
+    pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
+    for i, (_,input, target) in pbar:
+        optimizer.zero_grad()
+        if args.onGPU == True:
+            input = input.cuda().float() / 255.0        
+        output = model(input)
+        with torch.cuda.amp.autocast():
+            focal_loss,tversky_loss,loss = criterion(output,target)
+
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+        pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
+                                     (f'{epoch}/{300 - 1}', tversky_loss, focal_loss, loss.item()))
 
 
 @torch.no_grad()
 def val(val_loader, model):
-    '''
-    :param args: general arguments
-    :param val_loader: loaded for validation dataset
-    :param model: model
-    :param criterion: loss function
-    :return: average epoch loss, overall pixel-wise accuracy, per class accuracy, per class iu, and mIOU
-    '''
-    #switch to evaluation mode
+
     model.eval()
-    # crf2=CRF(2)
-    # iouEvalVal = iouEval(args.classes)
+
 
     DA=SegmentationMetric(2)
     LL=SegmentationMetric(2)
 
-    epoch_loss = []
     da_acc_seg = AverageMeter()
     da_IoU_seg = AverageMeter()
     da_mIoU_seg = AverageMeter()
@@ -161,9 +174,7 @@ def val(val_loader, model):
 
     da_segment_result = (da_acc_seg.avg,da_IoU_seg.avg,da_mIoU_seg.avg)
     ll_segment_result = (ll_acc_seg.avg,ll_IoU_seg.avg,ll_mIoU_seg.avg)
-
-    print("DA :",da_segment_result)
-    print("LL :",ll_segment_result)
+    return da_segment_result,ll_segment_result
 
 
 
