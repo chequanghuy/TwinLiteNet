@@ -4,7 +4,7 @@ import argparse
 # from tqdm.autonotebook import tqdm
 import os
 import torch
-from cnn import Full as net
+from model.TwinLite import TwinLiteNet as Net
 import onnx
 import torch
 
@@ -152,7 +152,7 @@ def run(
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str,
+    parser.add_argument('--weights', type=str,
                         default='pretrained/model_best.pth', help='model.pt path(s)')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[360, 640], help='image (h, w)')
     parser.add_argument('--batch-size', type=int, default=1, help='batch size')
