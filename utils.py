@@ -113,12 +113,12 @@ def val(val_loader, model):
     model.eval()
 
 
-    DA=SegmentationMetric(2)
+#    DA=SegmentationMetric(2)
     LL=SegmentationMetric(2)
 
-    da_acc_seg = AverageMeter()
-    da_IoU_seg = AverageMeter()
-    da_mIoU_seg = AverageMeter()
+#    da_acc_seg = AverageMeter()
+ #   da_IoU_seg = AverageMeter()
+  #  da_mIoU_seg = AverageMeter()
 
     ll_acc_seg = AverageMeter()
     ll_IoU_seg = AverageMeter()
@@ -139,25 +139,25 @@ def val(val_loader, model):
         with torch.no_grad():
             output = model(input_var)
 
-        out_da,out_ll=output
-        target_da,target_ll=target
+        out_ll=output
+        target_ll=target
 
-        _,da_predict=torch.max(out_da, 1)
-        _,da_gt=torch.max(target_da, 1)
+#        _,da_predict=torch.max(out_da, 1)
+ #       _,da_gt=torch.max(target_da, 1)
 
         _,ll_predict=torch.max(out_ll, 1)
         _,ll_gt=torch.max(target_ll, 1)
-        DA.reset()
-        DA.addBatch(da_predict.cpu(), da_gt.cpu())
+  #      DA.reset()
+   #     DA.addBatch(da_predict.cpu(), da_gt.cpu())
 
 
-        da_acc = DA.pixelAccuracy()
-        da_IoU = DA.IntersectionOverUnion()
-        da_mIoU = DA.meanIntersectionOverUnion()
+#        da_acc = DA.pixelAccuracy()
+ #       da_IoU = DA.IntersectionOverUnion()
+  #      da_mIoU = DA.meanIntersectionOverUnion()
 
-        da_acc_seg.update(da_acc,input.size(0))
-        da_IoU_seg.update(da_IoU,input.size(0))
-        da_mIoU_seg.update(da_mIoU,input.size(0))
+   #     da_acc_seg.update(da_acc,input.size(0))
+    #    da_IoU_seg.update(da_IoU,input.size(0))
+     #   da_mIoU_seg.update(da_mIoU,input.size(0))
 
 
         LL.reset()
@@ -172,9 +172,9 @@ def val(val_loader, model):
         ll_IoU_seg.update(ll_IoU,input.size(0))
         ll_mIoU_seg.update(ll_mIoU,input.size(0))
 
-    da_segment_result = (da_acc_seg.avg,da_IoU_seg.avg,da_mIoU_seg.avg)
+#    da_segment_result = (da_acc_seg.avg,da_IoU_seg.avg,da_mIoU_seg.avg)
     ll_segment_result = (ll_acc_seg.avg,ll_IoU_seg.avg,ll_mIoU_seg.avg)
-    return da_segment_result,ll_segment_result
+    return ll_segment_result
 
 
 
