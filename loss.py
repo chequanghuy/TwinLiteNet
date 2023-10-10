@@ -34,18 +34,18 @@ class TotalLoss(nn.Module):
 
     def forward(self, outputs, targets):
         
-        seg_da,seg_ll=targets
-        out_da,out_ll=outputs
+        seg_ll=targets
+        out_ll=outputs
 
-        _,seg_da= torch.max(seg_da, 1)
-        seg_da=seg_da.cuda()
+        #_,seg_da= torch.max(seg_da, 1)
+        #seg_da=seg_da.cuda()
 
         _,seg_ll= torch.max(seg_ll, 1)
         seg_ll=seg_ll.cuda()
 
 
-        tversky_loss = self.seg_tver_da(out_da, seg_da)+self.seg_tver_ll(out_ll, seg_ll)
-        focal_loss = self.seg_focal(out_ll, seg_ll)+self.seg_focal(out_da, seg_da)
+        tversky_loss =self.seg_tver_ll(out_ll, seg_ll)
+        focal_loss = self.seg_focal(out_ll, seg_ll)
 
 
         loss = focal_loss+tversky_loss
