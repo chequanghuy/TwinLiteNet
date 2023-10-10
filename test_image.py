@@ -21,14 +21,14 @@ def Run(model,img):
     with torch.no_grad():
         img_out = model(img)
     x0=img_out[0]
-    x1=img_out[1]
+    #x1=img_out[1]
 
-    _,da_predict=torch.max(x0, 1)
+    #_,da_predict=torch.max(x0, 1)
     _,ll_predict=torch.max(x1, 1)
 
-    DA = da_predict.byte().cpu().data.numpy()[0]*255
+    #DA = da_predict.byte().cpu().data.numpy()[0]*255
     LL = ll_predict.byte().cpu().data.numpy()[0]*255
-    img_rs[DA>100]=[255,0,0]
+    #img_rs[DA>100]=[255,0,0]
     img_rs[LL>100]=[0,255,0]
     
     return img_rs
