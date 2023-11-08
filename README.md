@@ -80,11 +80,13 @@ Our source code is inspired by:
 If you find our paper and code useful for your research, please consider giving a star :star:   and citation :pencil: :
 
 ```BibTeX
-@misc{che2023twinlitenet,
-      title={TwinLiteNet: An Efficient and Lightweight Model for Driveable Area and Lane Segmentation in Self-Driving Cars}, 
-      author={Quang Huy Che and Dinh Phuc Nguyen and Minh Quan Pham and Duc Khai Lam},
-      year={2023},
-      eprint={2307.10705},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
-}
+@INPROCEEDINGS{10288646,
+  author={Che, Quang-Huy and Nguyen, Dinh-Phuc and Pham, Minh-Quan and Lam, Duc-Khai},
+  booktitle={2023 International Conference on Multimedia Analysis and Pattern Recognition (MAPR)}, 
+  title={TwinLiteNet: An Efficient and Lightweight Model for Driveable Area and Lane Segmentation in Self-Driving Cars}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={1-6},
+  doi={10.1109/MAPR59823.2023.10288646}}
+
