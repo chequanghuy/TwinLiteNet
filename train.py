@@ -1,4 +1,8 @@
 import os
+import sys 
+# put the directory efficientvit instead of '..'
+sys.path.insert(1, os.path.join(sys.path[0], '/kaggle/working/efficientvit'))
+######
 import torch
 import pickle
 from model import TwinLite as net
@@ -8,13 +12,18 @@ from argparse import ArgumentParser
 from utils import train, val, netParams, save_checkpoint, poly_lr_scheduler
 import torch.optim.lr_scheduler
 
+
+
+from efficientvit.seg_model_zoo import create_seg_model
+
 from loss import TotalLoss
 
 def train_net(args):
     # load the model
     cuda_available = torch.cuda.is_available()
     num_gpus = torch.cuda.device_count()
-    model = net.TwinLiteNet()
+    # model = net.TwinLiteNet()
+    model = create_seg_model('b0','bdd',False)
 
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
@@ -103,4 +112,3 @@ if __name__ == '__main__':
     parser.add_argument('--pretrained', default='', help='Pretrained ESPNetv2 weights.')
 
     train_net(parser.parse_args())
-
