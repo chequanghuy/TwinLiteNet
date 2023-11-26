@@ -107,8 +107,8 @@ class MyDataset(torch.utils.data.Dataset):
         image_name=os.path.join(self.root,self.names[idx])
         
         image = cv2.imread(image_name)
-        label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
-        label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
+        label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
+        label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
         if not self.valid:
             if random.random()<0.5:
                 combination = (image, label1, label2)
