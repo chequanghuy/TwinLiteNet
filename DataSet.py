@@ -87,10 +87,10 @@ class MyDataset(torch.utils.data.Dataset):
         self.Tensor = transforms.ToTensor()
         self.valid=valid
         if valid:
-            self.root='/content/data/bdd100k/bdd100k/images/100k/val'
+            self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/val'
             self.names=os.listdir(self.root)
         else:
-            self.root='/content/data/bdd100k/bdd100k/images/100k/train'
+            self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
             self.names=os.listdir(self.root)
 
     def __len__(self):
@@ -102,17 +102,17 @@ class MyDataset(torch.utils.data.Dataset):
         :param idx: Index of the image file
         :return: returns the image and corresponding label file.
         '''
-        W_=640
-        H_=360
+        W_=256
+        H_=256
         image_name=os.path.join(self.root,self.names[idx])
         
         image = cv2.imread(image_name)
-        #label1 = cv2.imread(image_name.replace("images","segments").replace("jpg","png"), 0)
-        label2 = cv2.imread(image_name.replace("images","labels/bdd_lane_gt").replace("jpg","png"), 0)
+        label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
+        label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
         if not self.valid:
             if random.random()<0.5:
                 combination = (image, label1, label2)
-                (image, label2)= random_perspective(
+                (image, label1, label2)= random_perspective(
                     combination=combination,
                     degrees=10,
                     translate=0.1,
@@ -123,31 +123,28 @@ class MyDataset(torch.utils.data.Dataset):
                 augment_hsv(image)
             if random.random() < 0.5:
                 image = np.fliplr(image)
-                #label1 = np.fliplr(label1)
+                label1 = np.fliplr(label1)
                 label2 = np.fliplr(label2)
             
-        #label1 = cv2.resize(label1, (W_, H_))
+        label1 = cv2.resize(label1, (W_, H_))
         label2 = cv2.resize(label2, (W_, H_))
         image = cv2.resize(image, (W_, H_))
 
-        #_,seg_b1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY_INV)
+        _,seg_b1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY_INV)
         _,seg_b2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY_INV)
-        #_,seg1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY)
+        _,seg1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY)
         _,seg2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY)
 
-        #seg1 = self.Tensor(seg1)
+        seg1 = self.Tensor(seg1)
         seg2 = self.Tensor(seg2)
-        #seg_b1 = self.Tensor(seg_b1)
+        seg_b1 = self.Tensor(seg_b1)
         seg_b2 = self.Tensor(seg_b2)
-        #seg_da = torch.stack((seg_b1[0], seg1[0]),0)
+        seg_da = torch.stack((seg_b1[0], seg1[0]),0)
         seg_ll = torch.stack((seg_b2[0], seg2[0]),0)
         image = image[:, :, ::-1].transpose(2, 0, 1)
         image = np.ascontiguousarray(image)
 
 
        
-        return image_name,torch.from_numpy(image),(seg_ll)
+        return image_name,torch.from_numpy(image),(seg_da,seg_ll)
     
-
-
-
