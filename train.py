@@ -83,9 +83,9 @@ def train_net(args):
         # train for one epoch
         model.train()
         train( args, trainLoader, model, criteria, optimizer, epoch)
-        model.eval()
-        # validation
-        val(valLoader, model)
+        # model.eval()
+        # # validation
+        # val(valLoader, model)
         torch.save(model.state_dict(), model_file_name)
         
         save_checkpoint({
