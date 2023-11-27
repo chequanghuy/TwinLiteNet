@@ -102,8 +102,8 @@ class MyDataset(torch.utils.data.Dataset):
         :param idx: Index of the image file
         :return: returns the image and corresponding label file.
         '''
-        W_=256
-        H_=256
+        W_=512
+        H_=512
         image_name=os.path.join(self.root,self.names[idx])
         
         image = cv2.imread(image_name)
