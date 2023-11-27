@@ -141,10 +141,11 @@ class MyDataset(torch.utils.data.Dataset):
         seg_b2 = self.Tensor(seg_b2)
         seg_da = torch.stack((seg_b1[0], seg1[0]),0)
         seg_ll = torch.stack((seg_b2[0], seg2[0]),0)
-        image = image[:, :, ::-1].transpose(2, 0, 1)
+        # image = image[:, :, ::-1].transpose(2, 0, 1)
         image = np.ascontiguousarray(image)
 
-
-       
-        return image_name,torch.from_numpy(image),(seg_da,seg_ll)
+        if self.transform is not None :
+            image = self.transform(image)
+          
+        return image_name,image,(seg_da,seg_ll)
     
