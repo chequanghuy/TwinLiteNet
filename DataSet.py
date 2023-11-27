@@ -91,7 +91,7 @@ class MyDataset(torch.utils.data.Dataset):
             self.names=os.listdir(self.root)
         else:
             self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
-            self.names=os.listdir(self.root)
+            self.names=os.listdir(self.root)[:10000]
 
     def __len__(self):
         return len(self.names)
