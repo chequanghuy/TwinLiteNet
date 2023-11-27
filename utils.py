@@ -90,7 +90,7 @@ def train(args, train_loader, model, criterion, optimizer, epoch):
     pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
     for i, (_,input, target) in pbar:
         if args.onGPU == True:
-            input = input.cuda().float() / 255.0        
+            input = input.cuda().float()   
         output = model(input)
         output = (resize(output[0],[512, 512]), resize(output[1],[512, 512]))
         # target=target.cuda()
@@ -116,7 +116,7 @@ def train16fp(args, train_loader, model, criterion, optimizer, epoch,scaler):
     for i, (_,input, target) in pbar:
         optimizer.zero_grad()
         if args.onGPU == True:
-            input = input.cuda().float() / 255.0        
+            input = input.cuda().float()      
         output = model(input)
         with torch.cuda.amp.autocast():
             focal_loss,tversky_loss,loss = criterion(output,target)
