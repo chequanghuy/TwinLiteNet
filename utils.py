@@ -92,7 +92,7 @@ def train(args, train_loader, model, criterion, optimizer, epoch):
         if args.onGPU == True:
             input = input.cuda().float() / 255.0        
         output = model(input)
-        output = (resize(output[0],[256, 256]), resize(output[1],[256, 256]))
+        output = (resize(output[0],[512, 512]), resize(output[1],[512, 512]))
         # target=target.cuda()
         optimizer.zero_grad()
 
@@ -159,7 +159,7 @@ def val(val_loader, model):
         # run the mdoel
         with torch.no_grad():
             output = model(input_var)
-            output = (resize(output[0],[256, 256]), resize(output[1],[256, 256]))
+            output = (resize(output[0],[512, 512]), resize(output[1],[512, 512]))
 
         out_da,out_ll=output
         target_da,target_ll=target
