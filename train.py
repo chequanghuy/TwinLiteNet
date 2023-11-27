@@ -11,6 +11,8 @@ import DataSet as myDataLoader
 from argparse import ArgumentParser
 from utils import train, val, netParams, save_checkpoint, poly_lr_scheduler
 import torch.optim.lr_scheduler
+from torchvision.transforms import transforms as T
+
 
 
 
@@ -34,9 +36,17 @@ def train_net(args):
     if not os.path.exists(args.savedir):
         os.mkdir(args.savedir)
 
+    transform=T.Compose([
+    T.ToTensor(),
+    T.Normalize(
+        mean=[0.485,0.456,0.406],
+        std=[0.229,0.224,0.225]
+    ),
 
+])
+    
     trainLoader = torch.utils.data.DataLoader(
-        myDataLoader.MyDataset(),
+        myDataLoader.MyDataset(transform=transform),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
 
 
