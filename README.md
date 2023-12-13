@@ -59,7 +59,6 @@ python3 test_image.py
 <div align=center>
 <img src='image\DA_vs.jpg' width='600'>
 </div>
-
 ### Lane Detection
 
 <div align=center>
