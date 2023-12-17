@@ -4,6 +4,8 @@
 
 # TwinLiteNetV2: A small stone can kill a giant
 
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/twinlitenet-an-efficient-and-lightweight/lane-detection-on-bdd100k-val)](https://paperswithcode.com/sota/lane-detection-on-bdd100k-val?p=twinlitenet-an-efficient-and-lightweight)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/twinlitenet-an-efficient-and-lightweight/drivable-area-detection-on-bdd100k-val)](https://paperswithcode.com/sota/drivable-area-detection-on-bdd100k-val?p=twinlitenet-an-efficient-and-lightweight)
 
 ## 🚀 Paper coming soon! 
 ## Requirement
