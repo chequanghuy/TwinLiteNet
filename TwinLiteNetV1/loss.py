@@ -4,8 +4,10 @@ import cv2
 import numpy as np
 from torch.nn.modules.loss import _Loss
 import torch.nn.functional as F
+# from utils import BBoxTransform, ClipBoxes
 from typing import Optional, List
 from functools import partial
+# from utils.plot import display
 from const import *
 
 
@@ -13,17 +15,20 @@ class TotalLoss(nn.Module):
     '''
     This file defines a cross entropy loss for 2D images
     '''
-    def __init__(self, hyp, is320=False):
+    def __init__(self):
         '''
         :param weight: 1D weight vector to deal with the class-imbalance
         '''
         super().__init__()
 
-        self.is320 = is320
-        alpha1, gamma1, alpha2, gamma2, alpha3, gamma3 = hyp["alpha1"], hyp["gamma1"], hyp["alpha2"], hyp["gamma2"], hyp["alpha3"], hyp["gamma3"]
-        self.seg_tver_da = TverskyLoss(mode="multiclass", alpha=alpha1, beta=1-alpha1, gamma=gamma1, from_logits=True)
-        self.seg_tver_ll = TverskyLoss(mode="multiclass", alpha=alpha2, beta=1-alpha2, gamma=gamma2, from_logits=True)
-        self.seg_focal = FocalLossSeg(mode="multiclass", alpha=alpha3, gamma=gamma3)
+        self.update_iter_interval = 500
+        self.ce_loss_history = []
+        self.tvk_loss_history = []
+
+        self.seg_tver_da = TverskyLoss(mode="multiclass", alpha=0.7, beta=0.3, gamma=4.0/3, from_logits=True)
+        self.seg_tver_ll = TverskyLoss(mode="multiclass", alpha=0.9, beta=0.1, gamma=4.0/3, from_logits=True)
+        self.seg_focal = FocalLossSeg(mode="multiclass", alpha=0.25)
+        # self.seg_criterion3 = FocalLossSeg(mode="multiclass", alpha=1)
 
 
 
@@ -31,10 +36,6 @@ class TotalLoss(nn.Module):
         
         seg_da,seg_ll=targets
         out_da,out_ll=outputs
-        if not self.is320:
-            out_da,out_ll=out_da[:,:,12:-12],out_ll[:,:,12:-12]
-        else:
-            out_da,out_ll=out_da[:,:,6:-6],out_ll[:,:,6:-6]
 
         _,seg_da= torch.max(seg_da, 1)
         seg_da=seg_da.cuda()
@@ -42,87 +43,14 @@ class TotalLoss(nn.Module):
         _,seg_ll= torch.max(seg_ll, 1)
         seg_ll=seg_ll.cuda()
 
-        tversky_da_loss,tversky_ll_loss = self.seg_tver_da(out_da, seg_da), self.seg_tver_ll(out_ll, seg_ll)
-        focal_da_loss, focal_ll_loss = self.seg_focal(out_da, seg_da),self.seg_focal(out_ll, seg_ll)
 
-        tversky_loss,focal_loss=tversky_da_loss+tversky_ll_loss,focal_da_loss+ focal_ll_loss
+        tversky_loss = self.seg_tver_da(out_da, seg_da)+self.seg_tver_ll(out_ll, seg_ll)
+        focal_loss = self.seg_focal(out_ll, seg_ll)+self.seg_focal(out_da, seg_da)
+
+
         loss = focal_loss+tversky_loss
+        # print(loss1.item(),skyl1.item(),loss2.item(),skyl2.item())
         return focal_loss.item(),tversky_loss.item(),loss
-
-
-class TotalLossDA(nn.Module):
-    '''
-    This file defines a cross entropy loss for 2D images
-    '''
-    def __init__(self, hyp, is320=False):
-        '''
-        :param weight: 1D weight vector to deal with the class-imbalance
-        '''
-        super().__init__()
-
-        self.is320=is320
-        alpha1, gamma1, alpha2, gamma2, alpha3, gamma3 = hyp["alpha1"], hyp["gamma1"], hyp["alpha2"], hyp["gamma2"], hyp["alpha3"], hyp["gamma3"]
-        self.seg_tver_da = TverskyLoss(mode="multiclass", alpha=alpha1, beta=1-alpha1, gamma=gamma1, from_logits=True)
-        self.seg_focal = FocalLossSeg(mode="multiclass", alpha=alpha3, gamma=gamma3)
-
-
-
-    def forward(self, outputs, targets):
-        
-        seg_da=targets[0]
-        out_da=outputs
-        if not self.is320:
-            out_da=out_da[:,:,12:-12]
-        else:
-            out_da=out_da[:,:,6:-6]
-
-        _,seg_da= torch.max(seg_da, 1)
-        seg_da=seg_da.cuda()
-
-
-        tversky_da_loss = self.seg_tver_da(out_da, seg_da)
-        focal_da_loss = self.seg_focal(out_da, seg_da)
-
-        loss = focal_da_loss+tversky_da_loss
-        return focal_da_loss.item(),tversky_da_loss.item(),1.2*loss
-
-
-class TotalLossLL(nn.Module):
-    '''
-    This file defines a cross entropy loss for 2D images
-    '''
-    def __init__(self, hyp, is320=False):
-        '''
-        :param weight: 1D weight vector to deal with the class-imbalance
-        '''
-        super().__init__()
-
-        self.is320=is320
-        alpha1, gamma1, alpha2, gamma2, alpha3, gamma3 = hyp["alpha1"], hyp["gamma1"], hyp["alpha2"], hyp["gamma2"], hyp["alpha3"], hyp["gamma3"]
-        self.seg_tver_ll = TverskyLoss(mode="multiclass", alpha=alpha2, beta=1-alpha2, gamma=gamma2, from_logits=True)
-        self.seg_focal = FocalLossSeg(mode="multiclass", alpha=alpha3, gamma=gamma3)
-
-
-
-    def forward(self, outputs, targets):
-        
-        seg_ll=targets[1]
-        out_ll=outputs
-        if not self.is320:
-            out_ll=out_ll[:,:,12:-12]
-        else:
-            out_ll=out_ll[:,:,6:-6]
-
-        _,seg_ll= torch.max(seg_ll, 1)
-        seg_ll=seg_ll.cuda()
-
-
-        tversky_ll_loss = self.seg_tver_ll(out_ll, seg_ll)
-        focal_ll_loss = self.seg_focal(out_ll, seg_ll)
-
-        loss = focal_ll_loss+tversky_ll_loss
-        return focal_ll_loss.item(),tversky_ll_loss.item(),1.2*loss
-
 
 
 def calc_iou(a, b):
@@ -212,8 +140,8 @@ class FocalLossSeg(_Loss):
     def __init__(
         self,
         mode: str,
-        alpha: Optional[float] = 0.25, #Default none
-        gamma: Optional[float] = 2, #Default 2.0
+        alpha: Optional[float] = None,
+        gamma: Optional[float] = 2.0,
         ignore_index: Optional[int] = None,
         reduction: Optional[str] = "mean",
         normalized: bool = False,

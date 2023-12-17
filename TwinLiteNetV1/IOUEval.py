@@ -58,32 +58,13 @@ class SegmentationMetric(object):
     def __init__(self, numClass):
         self.numClass = numClass
         self.confusionMatrix = np.zeros((self.numClass,)*2)
-    def _get_values(self):
-        # Extracting values based on the provided structure
-        tn = self.confusionMatrix[0, 0]
-        fp = self.confusionMatrix[0, 1]
-        fn = self.confusionMatrix[1, 0]
-        tp = self.confusionMatrix[1, 1]
-        return tp, fp, fn, tn
-    def sensitivity(self):
-        tp, fp, fn, tn = self._get_values()
-        return tp / (tp + fn + 1e-12)
-
-    def specificity(self):
-        tp, fp, fn, tn = self._get_values()
-        return tn / (tn + fp + 1e-12)
 
     def pixelAccuracy(self):
         # return all class overall pixel accuracy
         # acc = (TP + TN) / (TP + TN + FP + TN)
         acc = np.diag(self.confusionMatrix).sum() /  self.confusionMatrix.sum()
         return acc
-    # def lineAccuracy(self):
-    #     Acc = np.diag(self.confusionMatrix) / (self.confusionMatrix.sum(axis=1) + 1e-12)
-    #     return Acc[1]
-    def lineAccuracy(self):
-        test = (self.sensitivity() + self.specificity()) / 2
-        return test
+        
 
     def classPixelAccuracy(self):
         # return each category pixel accuracy(A more accurate way to call it precision)
