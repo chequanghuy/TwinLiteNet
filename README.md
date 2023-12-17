@@ -1,3 +1,6 @@
+<div align="center">
+  <img src="twin.png" width="30%">
+</div>
 # TwinLiteNetV2: A small stone can kill a giant
 
 
