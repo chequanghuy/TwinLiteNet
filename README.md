@@ -1,5 +1,7 @@
 # TwinLiteNetV2: A small stone can kill a giant
 
+
+## 🚀 Paper coming soon! 
 ## Requirement
 See `requirements.txt` for additional dependencies and version requirements.
 
