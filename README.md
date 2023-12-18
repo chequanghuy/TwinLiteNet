@@ -1,6 +1,8 @@
 # TwinLiteNet: An Efficient and Lightweight Model for Driveable Area and Lane Segmentation in Self-Driving Cars
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/twinlitenet-an-efficient-and-lightweight/lane-detection-on-bdd100k-val)](https://paperswithcode.com/sota/lane-detection-on-bdd100k-val?p=twinlitenet-an-efficient-and-lightweight)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/twinlitenet-an-efficient-and-lightweight/drivable-area-detection-on-bdd100k-val)](https://paperswithcode.com/sota/drivable-area-detection-on-bdd100k-val?p=twinlitenet-an-efficient-and-lightweight)
+
+
+
+
 ## Requirement
 See `requirements.txt` for additional dependencies and version requirements.
 
@@ -88,4 +90,23 @@ If you find our paper and code useful for your research, please consider giving 
   number={},
   pages={1-6},
   doi={10.1109/MAPR59823.2023.10288646}}
+```
+
+<div align="center">
+  <img src="twin.png" width="30%">
+</div>
+
+# TwinLiteNetV2: A small stone can kill a giant
+## 🚀 Coming soon! 
+
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/twinlitenet-an-efficient-and-lightweight/lane-detection-on-bdd100k-val)](https://paperswithcode.com/sota/lane-detection-on-bdd100k-val?p=twinlitenet-an-efficient-and-lightweight)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/twinlitenet-an-efficient-and-lightweight/drivable-area-detection-on-bdd100k-val)](https://paperswithcode.com/sota/drivable-area-detection-on-bdd100k-val?p=twinlitenet-an-efficient-and-lightweight)
+
+| Model | size<br><sup>(Height x Width) | Lane<br><sup>(Accuracy) | Lane<br><sup>(IOU) | Drivable Area<br><sup>(mIOU)  | params<br><sup>(M) | FLOPs<br><sup> (B) |
+| ----- | ----------------------------- | ----------------------- | ------------------ | ----------------------------- | ----------------------------- | ----------------------------- |
+| [TwinLiteNetV2-Nano]()| 384 x 640                   | 70.8 | 23.6              | 87.2                       | 0.03   | 0.485 |
+| [TwinLiteNetV2-Small]()| 384 x 640                   | 75.9 | 28.7              | 90.4                      | 0.14   | 1.366 |
+| [TwinLiteNetv2-Medium]()| 384 x 640                   | 79.3 | 32.6              | 92.3                     | 0.62   | 5.088 |
+| [TwinLiteNetV2-Large]() | 384 x 640                   | 81.7 | 34.2              | 92.9                     | 2.78   | 21.526 |
+
 
