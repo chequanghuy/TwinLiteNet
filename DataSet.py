@@ -102,7 +102,7 @@ class MyDataset(torch.utils.data.Dataset):
         :param idx: Index of the image file
         :return: returns the image and corresponding label file.
         '''
-        W_=512
+        W_=1024
         H_=512
         image_name=os.path.join(self.root,self.names[idx])
         
