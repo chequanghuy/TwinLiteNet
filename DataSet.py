@@ -242,10 +242,10 @@ class IADDataset(torch.utils.data.Dataset):
         self.Tensor = transforms.ToTensor()
         self.valid=valid
         if valid:
-            self.root='/kaggle/input/iadd-val/img'
+            self.root='/kaggle/working/IADD/train/img'
             self.names=os.listdir(self.root)
         else:
-            self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
+            self.root='/kaggle/working/IADD/train/img'
             self.names=os.listdir(self.root)#[:1000]
 
     def __len__(self):
@@ -262,8 +262,8 @@ class IADDataset(torch.utils.data.Dataset):
         image_name=os.path.join(self.root,self.names[idx])
         
         image = cv2.imread(image_name)
-        label1 = cv2.imread(image_name.replace("img","da").replace("jpg","png"), 0)
-        label2 = cv2.imread(image_name.replace("img","la").replace("jpg","png"), 0)
+        label1 = cv2.imread(image_name.replace("img","drivable").replace("jpg","png"), 0)
+        label2 = cv2.imread(image_name.replace("img","lane").replace("jpg","png"), 0)
         if not self.valid:
             if random.random()<0.5:
                 combination = (image, label1, label2)
