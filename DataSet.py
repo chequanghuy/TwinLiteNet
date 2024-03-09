@@ -242,10 +242,10 @@ class IADDataset(torch.utils.data.Dataset):
         self.Tensor = transforms.ToTensor()
         self.valid=valid
         if valid:
-            self.root='/kaggle/working/IADD/train/img'
+            self.root='/kaggle/working/IADD/IADDv5/train/img'
             self.names=os.listdir(self.root)
         else:
-            self.root='/kaggle/working/IADD/train/img'
+            self.root='/kaggle/working/IADD/IADDv5/train/img'
             self.names=os.listdir(self.root)#[:1000]
 
     def __len__(self):
