@@ -25,7 +25,7 @@ def train_net(args):
     cuda_available = torch.cuda.is_available()
     num_gpus = torch.cuda.device_count()
     # model = net.TwinLiteNet()
-    model = create_seg_model('b0','bdd','model/model_149.pth)
+    model = create_seg_model('b0','bdd',weight_url='model/model_149.pth)
 
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
