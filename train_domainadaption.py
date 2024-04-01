@@ -25,7 +25,7 @@ def train_net(args):
     cuda_available = torch.cuda.is_available()
     num_gpus = torch.cuda.device_count()
     # model = net.TwinLiteNet()
-    model = create_seg_model('b0','bdd',False)
+    model = create_seg_model('b0','bdd','model/model_149.pth)
 
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
@@ -46,12 +46,12 @@ def train_net(args):
 ])
     
     trainLoader = torch.utils.data.DataLoader(
-        myDataLoader.MyDataset(transform=transform),
+        myDataLoader.MIXEDataset(transform=transform,valid=False),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
 
 
     valLoader = torch.utils.data.DataLoader(
-        myDataLoader.MyDataset(valid=True),
+        myDataLoader.MIXEDataset(valid=True),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     if cuda_available:
@@ -119,6 +119,6 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=5e-4, help='Initial learning rate')
     parser.add_argument('--savedir', default='./test_', help='directory to save the results')
     parser.add_argument('--resume', type=str, default='', help='Use this flag to load last checkpoint for training')
-    parser.add_argument('--pretrained', default='', help='Pretrained ESPNetv2 weights.')
+    parser.add_argument('--pretrained', default='model/model_149.pth', help='Pretrained ESPNetv2 weights.')
 
     train_net(parser.parse_args())
