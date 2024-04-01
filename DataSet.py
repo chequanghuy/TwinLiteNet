@@ -329,6 +329,10 @@ class MIXEDataset(torch.utils.data.Dataset):
             self.names1=os.listdir(self.root1)
             self.names2=os.listdir(self.root2)#[:1500]
             self.names= self.names1 +  self.names2
+            self.names[::2] = self.names1
+            self.names[1::2] = self.names2
+
+        print(len(self.names))
 
     def __len__(self):
         return len(self.names)
@@ -342,12 +346,12 @@ class MIXEDataset(torch.utils.data.Dataset):
         W_=512
         H_=512
         if idx%2==0:
-            image_name=os.path.join(self.root1,self.names1[idx])
+            image_name=os.path.join(self.root1,self.names[idx])
             image = cv2.imread(image_name)
             label1 = cv2.imread(image_name.replace("img","drivable").replace(".jpg",".png"), 0)
             label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)    
         else:
-            image_name=os.path.join(self.root2,self.names2[idx])
+            image_name=os.path.join(self.root2,self.names[idx])
             image = cv2.imread(image_name)
             label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
             label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
