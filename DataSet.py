@@ -348,6 +348,7 @@ class MIXEDataset(torch.utils.data.Dataset):
             label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)    
         else:
             image_name=os.path.join(self.root2,self.names2[idx])
+            image = cv2.imread(image_name)
             label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
             label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
 
