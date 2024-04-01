@@ -328,6 +328,7 @@ class MIXEDataset(torch.utils.data.Dataset):
             self.root2='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
             self.names1=os.listdir(self.root1)
             self.names2=os.listdir(self.root2)#[:1500]
+            self.names= self.names1 +  self.names2
 
     def __len__(self):
         return len(self.names)
