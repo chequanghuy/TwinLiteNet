@@ -362,7 +362,7 @@ class MIXEDataset(torch.utils.data.Dataset):
         '''
         W_=512
         H_=512
-        if idx%3==0:
+        if idx%4==3:
             image_name=os.path.join(self.root1,self.names[idx])
             image = cv2.imread(image_name)
             label1 = cv2.imread(image_name.replace("img","da").replace(".jpg",".png"), 0)
