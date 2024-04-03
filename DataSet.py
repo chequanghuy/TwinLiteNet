@@ -72,6 +72,25 @@ def random_perspective(combination,  degrees=10, translate=.1, scale=.1, shear=1
 
     combination = (img, gray, line)
     return combination
+
+def mergList(list1, list2):
+  list3=list1+list2
+  count=0
+  i1=0
+  i2=0
+  max_idx=len(list3)
+  print(max_idx)
+  for idx in range(len(list3)):
+      if count < 3:
+        list3[idx]=list2[i2]
+        count+=1
+        i2+=1
+      else:
+        list3[idx]=list1[i1]
+        i1+=1
+        count=0
+  return list3
+
 class MyDataset(torch.utils.data.Dataset):
     '''
     Class to load the dataset
@@ -327,10 +346,8 @@ class MIXEDataset(torch.utils.data.Dataset):
             self.root1='/kaggle/working/IADD/IADDv5/train/img'
             self.root2='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
             self.names1=os.listdir(self.root1)
-            self.names2=os.listdir(self.root2)[:1001]
-            self.names= self.names1 +  self.names2
-            self.names[::2] = self.names1
-            self.names[1::2] = self.names2
+            self.names2=os.listdir(self.root2)[:63933]
+            self.names= mergList(self.names1, self.names2)
 
         print(len(self.names))
 
@@ -345,11 +362,11 @@ class MIXEDataset(torch.utils.data.Dataset):
         '''
         W_=512
         H_=512
-        if idx%2==0:
+        if idx%3==0:
             image_name=os.path.join(self.root1,self.names[idx])
             image = cv2.imread(image_name)
-            label1 = cv2.imread(image_name.replace("img","drivable").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)    
+            label1 = cv2.imread(image_name.replace("img","da").replace(".jpg",".png"), 0)
+            label2 = cv2.imread(image_name.replace("img","ll").replace(".jpg",".png"), 0)    
         else:
             image_name=os.path.join(self.root2,self.names[idx])
             image = cv2.imread(image_name)
