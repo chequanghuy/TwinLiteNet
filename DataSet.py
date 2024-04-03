@@ -339,7 +339,7 @@ class MIXEDataset(torch.utils.data.Dataset):
         self.Tensor = transforms.ToTensor()
         self.valid=valid
         if valid:
-            self.root1='/kaggle/working/IADD/IADDv5/val/img'
+            self.root1='/kaggle/working/iadd/img'
             self.root2=''
             self.names=os.listdir(self.root1)
         else:
