@@ -343,7 +343,7 @@ class MIXEDataset(torch.utils.data.Dataset):
             self.root2=''
             self.names=os.listdir(self.root1)
         else:
-            self.root1='/kaggle/working/iadd/img'
+            self.root1='/kaggle/working/iadd/img/content/train_p1_unlabeled'
             self.root2='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
             self.names1=os.listdir(self.root1)
             self.names2=os.listdir(self.root2)[:63934]
@@ -371,8 +371,8 @@ class MIXEDataset(torch.utils.data.Dataset):
             if idx%4==3:
                 image_name=os.path.join(self.root1,self.names[idx])
                 image = cv2.imread(image_name)
-                label1 = cv2.imread(image_name.replace("img","da").replace(".jpg",".png"), 0)
-                label2 = cv2.imread(image_name.replace("img","ll").replace(".jpg",".png"), 0)    
+                label1 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","da").replace(".jpg",".png"), 0)
+                label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","ll").replace(".jpg",".png"), 0)    
             else:
                 image_name=os.path.join(self.root2,self.names[idx])
                 image = cv2.imread(image_name)
