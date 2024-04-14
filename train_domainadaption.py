@@ -19,6 +19,42 @@ from torchvision.transforms import transforms as T
 from efficientvit.seg_model_zoo import create_seg_model
 
 from loss import TotalLoss
+import os
+
+path_list=[]
+for root, dirs, files in os.walk('/kaggle/working/iadd/img'):
+  for name in files:
+    path=os.path.join(root,name)
+    if path[-4:]=='.jpg':
+      path_list.append(path)
+        
+def pseudo_label_maker(names):
+    model = create_seg_model('b0','bdd',weight_url='/kaggle/input/model149/model_149.pth')
+    model=model.cuda()
+    convert_tensor = T.ToTensor()
+    for name in names:
+        image=cv2.imread(name)
+        img = image.astype(np.uint8)
+        img = cv2.resize(img, [512,512], interpolation=cv2.INTER_LINEAR)
+        img=convert_tensor(img).unsqueeze(0).cuda()
+        y_da_pred , y_ll_pred=model(transform2(img))
+        
+        y_da_pred=resize(y_da_pred, [1080, 1920])
+        y_ll_pred=resize(y_ll_pred, [1080, 1920])
+        
+        y_da_pred=y_da_pred[0].argmax(0).detach().cpu().numpy()
+        y_ll_pred=y_ll_pred[0].argmax(0).detach().cpu().numpy()
+        
+        y_da_pred=y_da_pred.astype(np.uint8)
+        y_ll_pred=y_ll_pred.astype(np.uint8)
+        
+        nam=name.split('/')[-1]
+        da_name='/kaggle/working/iadd/da/' + nam.replace('.jpg','.png')
+        ll_name='/kaggle/working/iadd/ll/' + nam.replace('.jpg','.png')
+        
+        cv2.imwrite(da_name,y_da_pred)
+        cv2.imwrite(ll_name,y_ll_pred)
+
 
 def train_net(args):
     # load the model
@@ -95,7 +131,7 @@ def train_net(args):
         train( args, trainLoader, model, criteria, optimizer, epoch)
         # model.eval()
         # # validation
-        # val(valLoader, model)
+        # da_segment_results , ll_segment_results = val(valLoader, model)
         torch.save(model.state_dict(), model_file_name)
         
         save_checkpoint({
