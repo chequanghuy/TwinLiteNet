@@ -15,6 +15,7 @@ from torchvision.transforms import transforms as T
 import cv2
 import numpy as np
 from torchvision.transforms import transforms as T
+import torch.nn.functional as F
 
 transform2=T.Compose([
 #     T.ToTensor(),
