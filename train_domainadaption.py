@@ -14,7 +14,16 @@ import torch.optim.lr_scheduler
 from torchvision.transforms import transforms as T
 import cv2
 import numpy as np
+from torchvision.transforms import transforms as T
 
+transform2=T.Compose([
+#     T.ToTensor(),
+    T.Normalize(
+        mean=[0.485,0.456,0.406],
+        std=[0.229,0.224,0.225]
+    ),
+
+])
 
 from efficientvit.seg_model_zoo import create_seg_model
 
