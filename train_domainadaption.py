@@ -14,7 +14,7 @@ import torch.optim.lr_scheduler
 from torchvision.transforms import transforms as T
 import cv2
 import numpy as np
-from torchvision.transforms import transforms as T
+from tqdm import tqdm
 import torch.nn.functional as F
 
 transform2=T.Compose([
@@ -86,8 +86,8 @@ def pseudo_label_maker(names,model):
         cv2.imwrite(ll_name,y_ll_pred)
         loop.set_description(f'epoch {epoch}s pseudo label makering: ')
 
-# model = create_seg_model('b0','bdd',weight_url='/kaggle/working/TwinLiteNet/model/model_149.pth')
-# pseudo_label_maker(path_list,model)
+model = create_seg_model('b0','bdd',,weight_url='/kaggle/working/TwinLiteNet/test_/model_1.pth')
+pseudo_label_maker(path_list,model)
 def train_net(args):
     # load the model
     cuda_available = torch.cuda.is_available()
