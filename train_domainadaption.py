@@ -55,7 +55,7 @@ def pseudo_label_maker(names,model):
         cv2.imwrite(da_name,y_da_pred)
         cv2.imwrite(ll_name,y_ll_pred)
 
-model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
+model = create_seg_model('b0','bdd',weight_url='/kaggle/working/TwinLiteNet/model/model_149.pth')
 pseudo_label_maker(path_list,model)
 def train_net(args):
     # load the model
@@ -63,7 +63,7 @@ def train_net(args):
     num_gpus = torch.cuda.device_count()
     # model = net.TwinLiteNet()
     model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
-    pseudo_label_maker(path_list,model)
+    # pseudo_label_maker(path_list,model)
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
 
