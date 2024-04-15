@@ -36,6 +36,25 @@ for root, dirs, files in os.walk('/kaggle/working/iadd/img'):
     path=os.path.join(root,name)
     if path[-4:]=='.jpg':
       path_list.append(path)
+def resize(
+    x: torch.Tensor,
+    size: any or None = None,
+    scale_factor: list[float] or None = None,
+    mode: str = "bicubic",
+    align_corners: bool or None = False,
+) -> torch.Tensor:
+    if mode in {"bilinear", "bicubic"}:
+        return F.interpolate(
+            x,
+            size=size,
+            scale_factor=scale_factor,
+            mode=mode,
+            align_corners=align_corners,
+        )
+    elif mode in {"nearest", "area"}:
+        return F.interpolate(x, size=size, scale_factor=scale_factor, mode=mode)
+    else:
+        raise NotImplementedError(f"resize(mode={mode}) not implemented.")
         
 def pseudo_label_maker(names,model):
     # model = create_seg_model('b0','bdd',weight_url='/kaggle/input/model149/model_149.pth')
