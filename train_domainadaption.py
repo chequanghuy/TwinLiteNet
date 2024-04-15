@@ -28,8 +28,8 @@ for root, dirs, files in os.walk('/kaggle/working/iadd/img'):
     if path[-4:]=='.jpg':
       path_list.append(path)
         
-def pseudo_label_maker(names):
-    model = create_seg_model('b0','bdd',weight_url='/kaggle/input/model149/model_149.pth')
+def pseudo_label_maker(names,model):
+    # model = create_seg_model('b0','bdd',weight_url='/kaggle/input/model149/model_149.pth')
     model=model.cuda()
     convert_tensor = T.ToTensor()
     for name in names:
@@ -55,14 +55,15 @@ def pseudo_label_maker(names):
         cv2.imwrite(da_name,y_da_pred)
         cv2.imwrite(ll_name,y_ll_pred)
 
-
+model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
+pseudo_label_maker(path_list,model)
 def train_net(args):
     # load the model
     cuda_available = torch.cuda.is_available()
     num_gpus = torch.cuda.device_count()
     # model = net.TwinLiteNet()
-    model = create_seg_model('b0','bdd',weight_url='model/model_149.pth')
-
+    model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
+    pseudo_label_maker(path_list,model)
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
 
@@ -109,7 +110,7 @@ def train_net(args):
         if os.path.isfile(args.resume):
             print("=> loading checkpoint '{}'".format(args.resume))
             checkpoint = torch.load(args.resume)
-            start_epoch = 0
+            start_epoch = checkpoint['epoch']
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})"
@@ -141,7 +142,7 @@ def train_net(args):
             'lr': lr
         }, args.savedir + 'checkpoint.pth.tar')
 
-        
+        pseudo_label_maker(path_list,model)
 
 
 if __name__ == '__main__':
