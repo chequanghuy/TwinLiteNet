@@ -86,14 +86,17 @@ def pseudo_label_maker(names,model):
         cv2.imwrite(ll_name,y_ll_pred)
         loop.set_description(f'epoch {epoch}s pseudo label makering: ')
 
-model = create_seg_model('b0','bdd',weight_url='/kaggle/working/TwinLiteNet/test_/model_1.pth')
+model = create_seg_model('b0','bdd',weight_url='/kaggle/input/model149/model_149.pth')
 pseudo_label_maker(path_list,model)
 def train_net(args):
     # load the model
     cuda_available = torch.cuda.is_available()
     num_gpus = torch.cuda.device_count()
     # model = net.TwinLiteNet()
-    model = create_seg_model('b0','bdd',False)
+
+    pretrained=args.pretrained
+    
+    model = create_seg_model('b0','bdd',weight_url=pretrained)
     # pseudo_label_maker(path_list,model)
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
@@ -141,8 +144,8 @@ def train_net(args):
         if os.path.isfile(args.resume):
             print("=> loading checkpoint '{}'".format(args.resume))
             checkpoint = torch.load(args.resume)
-            start_epoch = checkpoint['epoch']
-            lr=checkpoint['lr']
+            # start_epoch = checkpoint['epoch']
+            # lr=checkpoint['lr']
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})"
@@ -188,6 +191,6 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=5e-4, help='Initial learning rate')
     parser.add_argument('--savedir', default='./test_', help='directory to save the results')
     parser.add_argument('--resume', type=str, default='', help='Use this flag to load last checkpoint for training')
-    parser.add_argument('--pretrained', default='model/model_149.pth', help='Pretrained ESPNetv2 weights.')
+    parser.add_argument('--pretrained', default=None, help='Pretrained ESPNetv2 weights.')
 
     train_net(parser.parse_args())
