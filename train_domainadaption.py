@@ -86,8 +86,8 @@ def pseudo_label_maker(names,model):
         cv2.imwrite(ll_name,y_ll_pred)
         loop.set_description('pseudo relabeling: ')
 
-model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
-pseudo_label_maker(path_list,model)
+# model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
+# pseudo_label_maker(path_list,model)
 def train_net(args):
     # load the model
     cuda_available = torch.cuda.is_available()
