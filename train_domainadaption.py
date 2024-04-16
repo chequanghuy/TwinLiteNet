@@ -58,7 +58,7 @@ def resize(
         raise NotImplementedError(f"resize(mode={mode}) not implemented.")
         
 def pseudo_label_maker(names,model):
-    # model = create_seg_model('b0','bdd',weight_url='/kaggle/input/model149/model_149.pth')
+    # model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
     model=model.cuda()
     convert_tensor = T.ToTensor()
     loop  = tqdm(names)
@@ -86,7 +86,7 @@ def pseudo_label_maker(names,model):
         cv2.imwrite(ll_name,y_ll_pred)
         loop.set_description('pseudo relabeling: ')
 
-model = create_seg_model('b0','bdd',weight_url='/kaggle/input/model149/model_149.pth')
+model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
 pseudo_label_maker(path_list,model)
 def train_net(args):
     # load the model
@@ -144,8 +144,8 @@ def train_net(args):
         if os.path.isfile(args.resume):
             print("=> loading checkpoint '{}'".format(args.resume))
             checkpoint = torch.load(args.resume)
-            # start_epoch = checkpoint['epoch']
-            # lr=checkpoint['lr']
+            start_epoch = checkpoint['epoch']
+            lr=checkpoint['lr']
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})"
