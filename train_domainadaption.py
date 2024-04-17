@@ -95,8 +95,10 @@ def train_net(args):
     # model = net.TwinLiteNet()
 
     pretrained=args.pretrained
-    
-    # model = create_seg_model('b0','bdd',weight_url=pretrained)
+    if pretrained is not None:
+        model = create_seg_model('b0','bdd',weight_url=pretrained)
+    else:
+        model = create_seg_model('b0','bdd',False)
     # pseudo_label_maker(path_list,model)
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
