@@ -139,7 +139,7 @@ def train_net(args):
     criteria = TotalLoss()
 
     start_epoch = 0
-    lr = args.lr/10
+    lr = args.lr
 
     optimizer = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
 
