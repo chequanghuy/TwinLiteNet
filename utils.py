@@ -103,7 +103,7 @@ def train(args, train_loader, model, criterion, optimizer, epoch):
         loss.backward()
         optimizer.step()
         pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
-                                     (f'{epoch}/{300 - 1}', tversky_loss, focal_loss, loss.item()))
+                                     (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss.item()))
         
 
 def train16fp(args, train_loader, model, criterion, optimizer, epoch,scaler):
