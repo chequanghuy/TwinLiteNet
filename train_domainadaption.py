@@ -17,8 +17,8 @@ import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
 
-transform2=T.Compose([
-#     T.ToTensor(),
+transform=T.Compose([
+    T.ToTensor(),
     T.Normalize(
         mean=[0.485,0.456,0.406],
         std=[0.229,0.224,0.225]
@@ -66,8 +66,8 @@ def pseudo_label_maker(names,model):
         image=cv2.imread(name)
         img = image.astype(np.uint8)
         img = cv2.resize(img, [512,512], interpolation=cv2.INTER_LINEAR)
-        img=convert_tensor(img).unsqueeze(0).cuda()
-        y_da_pred , y_ll_pred=model(transform2(img))
+        img=transform(img).unsqueeze(0).cuda()
+        y_da_pred , y_ll_pred=model(img)
         
         y_da_pred=resize(y_da_pred, [1080, 1920])
         y_ll_pred=resize(y_ll_pred, [1080, 1920])
@@ -86,8 +86,8 @@ def pseudo_label_maker(names,model):
         cv2.imwrite(ll_name,y_ll_pred)
         loop.set_description('pseudo relabeling: ')
 
-# model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
-# pseudo_label_maker(path_list,model)
+model = create_seg_model('b0','bdd',weight_url='/kaggle/input/model149/model_149.pth')
+pseudo_label_maker(path_list,model)
 def train_net(args):
     # load the model
     cuda_available = torch.cuda.is_available()
@@ -138,7 +138,7 @@ def train_net(args):
     criteria = TotalLoss()
 
     start_epoch = 0
-    lr = args.lr
+    lr = args.lr/10
 
     optimizer = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
 
