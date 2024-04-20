@@ -37,6 +37,7 @@ for root, dirs, files in os.walk('/kaggle/working/iadd/img'):
     path=os.path.join(root,name)
     if path[-4:]=='.jpg':
       path_list.append(path)
+path_list=path_list[:100]
 def resize(
     x: torch.Tensor,
     size: any or None = None,
