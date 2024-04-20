@@ -345,8 +345,8 @@ class MIXEDataset(torch.utils.data.Dataset):
         else:
             self.root1='/kaggle/working/iadd/img/content/train_p1_unlabeled'
             self.root2='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
-            self.names1=os.listdir(self.root1)[:100]
-            self.names2=os.listdir(self.root2)[:301]#[:63934]
+            self.names1=os.listdir(self.root1)#[:100]
+            self.names2=os.listdir(self.root2)[:63934]
             self.names= mergList(self.names1, self.names2)
 
         print(len(self.names))
