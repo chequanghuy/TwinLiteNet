@@ -87,8 +87,7 @@ def pseudo_label_maker(names,model):
         cv2.imwrite(ll_name,y_ll_pred)
         loop.set_description('pseudo relabeling: ')
 
-model = create_seg_model('b0','bdd',weight_url='/kaggle/input/model149/model_149.pth')
-pseudo_label_maker(path_list,model)
+
 def train_net(args):
     # load the model
     cuda_available = torch.cuda.is_available()
@@ -98,8 +97,11 @@ def train_net(args):
     pretrained=args.pretrained
     if pretrained is not None:
         model = create_seg_model('b0','bdd',weight_url=pretrained)
+        print(' pseudo label makering using the pretrained weights')
+        pseudo_label_maker(path_list,model)
     else:
         model = create_seg_model('b0','bdd',False)
+
     # pseudo_label_maker(path_list,model)
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
@@ -151,10 +153,12 @@ def train_net(args):
             lr=checkpoint['lr']
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
+            pseudo_label_maker(path_list,model)
             print("=> loaded checkpoint '{}' (epoch {})"
                 .format(args.resume, 0))
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
+
 
 
     for epoch in range(start_epoch, args.max_epochs):
