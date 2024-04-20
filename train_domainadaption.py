@@ -37,7 +37,7 @@ for root, dirs, files in os.walk('/kaggle/working/iadd/img'):
     path=os.path.join(root,name)
     if path[-4:]=='.jpg':
       path_list.append(path)
-path_list=path_list[:100]
+# path_list=path_list[:100]
 def resize(
     x: torch.Tensor,
     size: any or None = None,
@@ -186,12 +186,12 @@ def train_net(args):
 if __name__ == '__main__':
 
     parser = ArgumentParser()
-    parser.add_argument('--max_epochs', type=int, default=100, help='Max. number of epochs')
+    parser.add_argument('--max_epochs', type=int, default=10, help='Max. number of epochs')
     parser.add_argument('--num_workers', type=int, default=12, help='No. of parallel threads')
     parser.add_argument('--batch_size', type=int, default=16, help='Batch size. 12 for ESPNet-C and 6 for ESPNet. '
                                                                    'Change as per the GPU memory')
     parser.add_argument('--step_loss', type=int, default=100, help='Decrease learning rate after how many epochs.')
-    parser.add_argument('--lr', type=float, default=5e-4, help='Initial learning rate')
+    parser.add_argument('--lr', type=float, default=5e-5 , help='Initial learning rate')
     parser.add_argument('--savedir', default='./test_', help='directory to save the results')
     parser.add_argument('--resume', type=str, default='', help='Use this flag to load last checkpoint for training')
     parser.add_argument('--pretrained', default=None, help='Pretrained ESPNetv2 weights.')
