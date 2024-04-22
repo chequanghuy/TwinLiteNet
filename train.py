@@ -58,10 +58,16 @@ def train_net(args):
         args.onGPU = True
         model = model.cuda()
         cudnn.benchmark = True
-
+    for param in model.parameters():
+        
+    param.requires_grad = False
     total_paramters = netParams(model)
-    print('Total network parameters: ' + str(total_paramters))
 
+    for param in model.head2.parameters():
+    param.requires_grad = True
+    
+    print('Total network parameters: ' + str(total_paramters))
+    
     criteria = TotalLoss()
 
     start_epoch = 0
