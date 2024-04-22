@@ -81,7 +81,7 @@ def mergList(list1, list2):
   max_idx=len(list3)
   print(max_idx)
   for idx in range(len(list3)):
-      if count < 3:
+      if count < 1:
         list3[idx]=list2[i2]
         count+=1
         i2+=1
@@ -346,7 +346,7 @@ class MIXEDataset(torch.utils.data.Dataset):
             self.root1='/kaggle/working/iadd/img/content/train_p1_unlabeled'
             self.root2='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
             self.names1=os.listdir(self.root1)#[:100]
-            self.names2=os.listdir(self.root2)[:63934]
+            self.names2=os.listdir(self.root2)[:21311]#[:63934]
             self.names= mergList(self.names1, self.names2)
 
         print(len(self.names))
