@@ -430,7 +430,7 @@ def train_net(args):
         trainables=0
         if param.requires_grad == True:
            trainables+=1
-        return trainables
+            
         param.requires_grad = True
     total_paramters = netParams(model)
     print('Total network parameters: ' + str(total_paramters))
