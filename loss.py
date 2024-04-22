@@ -44,8 +44,8 @@ class TotalLoss(nn.Module):
         seg_ll=seg_ll.cuda()
 
 
-        tversky_loss = 0*self.seg_tver_da(out_da, seg_da)+2*self.seg_tver_ll(out_ll, seg_ll)
-        focal_loss = 2*self.seg_focal(out_ll, seg_ll)+0*self.seg_focal(out_da, seg_da)
+        tversky_loss = 2*self.seg_tver_da(out_da, seg_da)+0*self.seg_tver_ll(out_ll, seg_ll)
+        focal_loss = 0*self.seg_focal(out_ll, seg_ll)+2*self.seg_focal(out_da, seg_da)
 
 
         loss = focal_loss+tversky_loss
