@@ -16,10 +16,10 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
-if not os.path.isfile('/kaggle/working/iadd/ll'):
+if not os.path.isdir('/kaggle/working/iadd/ll'):
     os.mkdir('/kaggle/working/iadd/ll')
     print('making ll folder')
-if not os.path.isfile('/kaggle/working/iadd/da'):
+if not os.path.isdir('/kaggle/working/iadd/da'):
     os.mkdir('/kaggle/working/iadd/da')
     print('making da folder')
 
