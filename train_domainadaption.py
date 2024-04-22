@@ -16,9 +16,9 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
-
-os.mkdir('/kaggle/working/iadd/da')
-os.mkdir('/kaggle/working/iadd/ll')
+if not os.path.isfile('/kaggle/working/iadd/ll'):
+    os.mkdir('/kaggle/working/iadd/da')
+    os.mkdir('/kaggle/working/iadd/ll')
 
 transform=T.Compose([
     T.ToTensor(),
