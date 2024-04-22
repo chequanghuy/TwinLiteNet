@@ -473,6 +473,10 @@ def train_net(args):
         # model.eval()
         # # validation
         # da_segment_results , ll_segment_results = val(valLoader, model)
+
+        Dataset= MIXEDataset(transform=transform , valid=True)
+        valid(model,Dataset)
+        
         torch.save(model.state_dict(), model_file_name)
         
         save_checkpoint({
