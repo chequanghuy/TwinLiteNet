@@ -368,7 +368,7 @@ class MIXEDataset(torch.utils.data.Dataset):
             label1 = cv2.imread(image_name.replace("img","drivable").replace(".jpg",".png"), 0)
             label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)   
         else:
-            if idx%4==3:
+            if idx%2==1:
                 image_name=os.path.join(self.root1,self.names[idx])
                 image = cv2.imread(image_name)
                 label1 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","da").replace(".jpg",".png"), 0)
