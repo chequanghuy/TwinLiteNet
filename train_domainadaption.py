@@ -429,7 +429,7 @@ def train_net(args):
         
     for param in model.parameters():
         param.requires_grad = False
-    for param in model.head2.parameters():
+    for param in model.head1.parameters():
         param.requires_grad = True   
         
     trainables=0
