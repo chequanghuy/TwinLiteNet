@@ -427,10 +427,10 @@ def train_net(args):
         model = model.cuda()
         cudnn.benchmark = True
         
-    for param in model.parameters():
-        param.requires_grad = False
-    for param in model.head1.parameters():
-        param.requires_grad = True   
+    # for param in model.parameters():
+    #     param.requires_grad = False
+    # for param in model.head1.parameters():
+    #     param.requires_grad = True   
         
     trainables=0
     for param in model.parameters():
