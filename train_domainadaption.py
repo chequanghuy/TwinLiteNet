@@ -19,6 +19,7 @@ import torch.nn.functional as F
 if not os.path.isfile('/kaggle/working/iadd/ll'):
     os.mkdir('/kaggle/working/iadd/da')
     os.mkdir('/kaggle/working/iadd/ll')
+    print('making da and ll folder')
 
 transform=T.Compose([
     T.ToTensor(),
