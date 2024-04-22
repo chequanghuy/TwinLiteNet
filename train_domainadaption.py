@@ -474,8 +474,8 @@ def train_net(args):
         # # validation
         # da_segment_results , ll_segment_results = val(valLoader, model)
 
-        Dataset= MIXEDataset(transform=transform , valid=True)
-        valid(model,Dataset)
+        Dataset0= MIXEDataset(transform=transform , valid=True)
+        valid(model,Dataset0)
         
         torch.save(model.state_dict(), model_file_name)
         
