@@ -390,7 +390,7 @@ def train_net(args):
     if pretrained is not None:
         model = create_seg_model('b0','bdd',weight_url=pretrained)
         print(' pseudo label makering using the pretrained weights')
-        pseudo_label_maker(path_list,model)
+        # pseudo_label_maker(path_list,model)
     else:
         model = create_seg_model('b0','bdd',False)
 
