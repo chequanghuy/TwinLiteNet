@@ -16,6 +16,8 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
+from DataSet import MyDataset,IADDataset,MIXEDataset
+
 if not os.path.isdir('/kaggle/working/iadd/ll'):
     os.mkdir('/kaggle/working/iadd/ll')
     print('making ll folder')
@@ -388,7 +390,7 @@ def train_net(args):
     if pretrained is not None:
         model = create_seg_model('b0','bdd',weight_url=pretrained)
         print(' pseudo label makering using the pretrained weights')
-        pseudo_label_maker(path_list,model)
+        # pseudo_label_maker(path_list,model)
     else:
         model = create_seg_model('b0','bdd',False)
 
@@ -427,7 +429,7 @@ def train_net(args):
         
     for param in model.parameters():
         param.requires_grad = False
-    for param in model.head1.parameters():
+    for param in model.head2.parameters():
         param.requires_grad = True   
         
     trainables=0
@@ -477,9 +479,6 @@ def train_net(args):
         # model.eval()
         # # validation
         # da_segment_results , ll_segment_results = val(valLoader, model)
-
-        Dataset0= MIXEDataset(transform=transform , valid=True)
-        valid(model,Dataset0)
         
         torch.save(model.state_dict(), model_file_name)
         
@@ -490,6 +489,8 @@ def train_net(args):
             'lr': lr
         }, args.savedir + 'checkpoint.pth.tar')
 
+        Dataset0= MIXEDataset(transform=transform , valid=True)
+        valid(model,Dataset0)
         pseudo_label_maker(path_list,model)
 
 
