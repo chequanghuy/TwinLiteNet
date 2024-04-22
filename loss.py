@@ -283,8 +283,8 @@ class DiceLoss(_Loss):
         Reference
             https://github.com/BloodAxe/pytorch-toolbelt
         """
-        y_pred=resize(y_pred,(512,512)
-        y_true=resize(y_true,(512,512)
+        y_pred=resize(y_pred,(512,512))
+        y_true=resize(y_true,(512,512))
         assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}
         super(DiceLoss, self).__init__()
         self.mode = mode
