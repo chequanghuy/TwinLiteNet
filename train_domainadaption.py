@@ -390,7 +390,7 @@ def train_net(args):
     if pretrained is not None:
         model = create_seg_model('b0','bdd',weight_url=pretrained)
         print(' pseudo label makering using the pretrained weights')
-        # pseudo_label_maker(path_list,model)
+        pseudo_label_maker(path_list,model)
     else:
         model = create_seg_model('b0','bdd',False)
 
@@ -414,12 +414,12 @@ def train_net(args):
 ])
     
     trainLoader = torch.utils.data.DataLoader(
-        myDataLoader.MIXEDataset(transform=transform,valid=False),
+        myDataLoader.IADDataset(transform=transform,valid=False),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
 
 
     valLoader = torch.utils.data.DataLoader(
-        myDataLoader.MIXEDataset(valid=True),
+        myDataLoader.IADDataset(valid=True),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     if cuda_available:
@@ -489,7 +489,7 @@ def train_net(args):
             'lr': lr
         }, args.savedir + 'checkpoint.pth.tar')
 
-        Dataset0= MIXEDataset(transform=transform , valid=True)
+        Dataset0= IADDataset(transform=transform , valid=True)
         valid(model,Dataset0)
         pseudo_label_maker(path_list,model)
 
