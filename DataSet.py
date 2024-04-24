@@ -441,7 +441,7 @@ class first_pseudo_label_dataset(torch.utils.data.Dataset):
         if valid:
             self.root=None
         else:
-            self.root='/kaggle/working/iadd/img/content/train_p1_unlabeled'
+            self.root='/kaggle/working/iadd/img/content/train_p1_unlabeled'[:100]
             self.names=os.listdir(self.root)
 
     def __len__(self):
