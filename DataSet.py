@@ -73,6 +73,58 @@ def random_perspective(combination,  degrees=10, translate=.1, scale=.1, shear=1
     combination = (img, gray, line)
     return combination
 
+def random_perspective2(combination,  degrees=10, translate=.1, scale=.1, shear=10, perspective=0.0, border=(0, 0)):
+    """combination of img transform"""
+    # torchvision.transforms.RandomAffine(degrees=(-10, 10), translate=(.1, .1), scale=(.9, 1.1), shear=(-10, 10))
+    # targets = [cls, xyxy]
+    img = combination
+    height = img.shape[0] + border[0] * 2  # shape(h,w,c)
+    width = img.shape[1] + border[1] * 2
+
+    # Center
+    C = np.eye(3)
+    C[0, 2] = -img.shape[1] / 2  # x translation (pixels)
+    C[1, 2] = -img.shape[0] / 2  # y translation (pixels)
+
+    # Perspective
+    P = np.eye(3)
+    P[2, 0] = random.uniform(-perspective, perspective)  # x perspective (about y)
+    P[2, 1] = random.uniform(-perspective, perspective)  # y perspective (about x)
+
+    # Rotation and Scale
+    R = np.eye(3)
+    a = random.uniform(-degrees, degrees)
+    # a += random.choice([-180, -90, 0, 90])  # add 90deg rotations to small rotations
+    s = random.uniform(1 - scale, 1 + scale)
+    # s = 2 ** random.uniform(-scale, scale)
+    R[:2] = cv2.getRotationMatrix2D(angle=a, center=(0, 0), scale=s)
+
+    # Shear
+    S = np.eye(3)
+    S[0, 1] = math.tan(random.uniform(-shear, shear) * math.pi / 180)  # x shear (deg)
+    S[1, 0] = math.tan(random.uniform(-shear, shear) * math.pi / 180)  # y shear (deg)
+
+    # Translation
+    T = np.eye(3)
+    T[0, 2] = random.uniform(0.5 - translate, 0.5 + translate) * width  # x translation (pixels)
+    T[1, 2] = random.uniform(0.5 - translate, 0.5 + translate) * height  # y translation (pixels)
+
+    # Combined rotation matrix
+    M = T @ S @ R @ P @ C  # order of operations (right to left) is IMPORTANT
+    if (border[0] != 0) or (border[1] != 0) or (M != np.eye(3)).any():  # image changed
+        if perspective:
+            img = cv2.warpPerspective(img, M, dsize=(width, height), borderValue=(114, 114, 114))
+
+        else:  # affine
+            img = cv2.warpAffine(img, M[:2], dsize=(width, height), borderValue=(114, 114, 114))
+
+
+
+
+    combination = img
+    return combination
+
+
 def mergList(list1, list2):
   list3=list1+list2
   count=0
@@ -461,8 +513,8 @@ class first_pseudo_label_dataset(torch.utils.data.Dataset):
         
         if not self.valid:
             if random.random()<0.5:
-                combination = (image,_,_)
-                (image,_,_)= random_perspective(
+                combination = image
+                image= random_perspective2(
                     combination=combination,
                     degrees=10,
                     translate=0.1,
