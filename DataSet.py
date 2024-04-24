@@ -423,3 +423,64 @@ class MIXEDataset(torch.utils.data.Dataset):
             image = self.transform(image)
           
         return image_name,image,(seg_da,seg_ll)
+
+class first_pseudo_label_dataset(torch.utils.data.Dataset):
+    '''
+    Class to load the dataset
+    '''
+    def __init__(self, transform=None,valid=False):
+        '''
+        :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
+        :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
+        :param transform: Type of transformation. SEe Transforms.py for supported transformations
+        '''
+
+        self.transform = transform
+        self.Tensor = transforms.ToTensor()
+        self.valid=valid
+        if valid:
+            self.root=None
+        else:
+            self.root='/kaggle/working/iadd/img/content/train_p1_unlabeled'
+            self.names=os.listdir(self.root)
+
+    def __len__(self):
+        return len(self.names)
+
+    def __getitem__(self, idx):
+        '''
+
+        :param idx: Index of the image file
+        :return: returns the image and corresponding label file.
+        '''
+        W_=512
+        H_=512
+        image_name=os.path.join(self.root,self.names[idx])
+        
+        image = cv2.imread(image_name)
+        
+        if not self.valid:
+            if random.random()<0.5:
+                combination = (image)
+                (image)= random_perspective(
+                    combination=combination,
+                    degrees=10,
+                    translate=0.1,
+                    scale=0.25,
+                    shear=0.0
+                )
+            if random.random()<0.5:
+                augment_hsv(image)
+            if random.random() < 0.5:
+                image = np.fliplr(image)
+            
+        image = cv2.resize(image, (W_, H_))
+
+        # image = image[:, :, ::-1].transpose(2, 0, 1)
+        image = np.ascontiguousarray(image)
+
+        if self.transform is not None :
+            image = self.transform(image)
+          
+        return image_name,image
+
