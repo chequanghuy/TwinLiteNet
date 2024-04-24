@@ -511,7 +511,7 @@ class first_pseudo_label_dataset(torch.utils.data.Dataset):
         
         image = cv2.imread(image_name)
         
-        if not self.valid:
+        if self.valid:
             if random.random()<0.5:
                 combination = image
                 image= random_perspective2(
