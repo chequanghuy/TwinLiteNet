@@ -281,8 +281,12 @@ class IADDataset(torch.utils.data.Dataset):
         image_name=os.path.join(self.root,self.names[idx])
         
         image = cv2.imread(image_name)
-        label1 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","da").replace(".jpg",".png"), 0)
-        label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","ll").replace(".jpg",".png"), 0)   
+        if self.valid:
+            label1 = cv2.imread(image_name.replace("img","drivable").replace(".jpg",".png"), 0)
+            label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)  
+        else:
+            label1 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","da").replace(".jpg",".png"), 0)
+            label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","ll").replace(".jpg",".png"), 0)   
         if not self.valid:
             if random.random()<0.5:
                 combination = (image, label1, label2)
