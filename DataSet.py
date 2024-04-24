@@ -461,8 +461,8 @@ class first_pseudo_label_dataset(torch.utils.data.Dataset):
         
         if not self.valid:
             if random.random()<0.5:
-                combination = (image)
-                (image)= random_perspective(
+                combination = (image,_,_ )
+                (image,_,_ )= random_perspective(
                     combination=combination,
                     degrees=10,
                     translate=0.1,
