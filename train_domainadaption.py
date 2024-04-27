@@ -16,7 +16,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
-from DataSet import MyDataset,IADDataset,MIXEDataset
+from DataSet import MyDataset,IADDataset,MIXEDataset,BDDataset
 
 if not os.path.isdir('/kaggle/working/iadd/ll'):
     os.mkdir('/kaggle/working/iadd/ll')
