@@ -576,7 +576,7 @@ class BDDataset(torch.utils.data.Dataset):
             label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0) 
         else:
             label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train","working/iadd/da").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train","working/iadd/da").replace(".jpg",".png"), 0)   
+            label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train","working/iadd/ll").replace(".jpg",".png"), 0)   
         if not self.valid:
             if random.random()<0.5:
                 combination = (image, label1, label2)
