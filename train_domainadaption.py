@@ -413,13 +413,22 @@ def train_net(args):
 
 ])
     
+    # trainLoader = torch.utils.data.DataLoader(
+    #     myDataLoader.BDDataset(transform=transform,valid=False),
+    #     batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
+
+
+    # valLoader = torch.utils.data.DataLoader(
+    #     myDataLoader.BDDatase(valid=True),
+    #     batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+
     trainLoader = torch.utils.data.DataLoader(
-        myDataLoader.BDDataset(transform=transform,valid=False),
+        BDDataset(transform=transform,valid=False),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
 
 
     valLoader = torch.utils.data.DataLoader(
-        myDataLoader.BDDatase(valid=True),
+        BDDatase(valid=True),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     if cuda_available:
