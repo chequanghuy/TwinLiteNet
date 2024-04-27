@@ -40,12 +40,13 @@ from loss import TotalLoss
 import os
 
 path_list=[]
-for root, dirs, files in os.walk('/kaggle/working/iadd/img'):
+# for root, dirs, files in os.walk('/kaggle/working/iadd/img'):
+for root, dirs, files in os.walk('/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'):
   for name in files:
     path=os.path.join(root,name)
     if path[-4:]=='.jpg':
       path_list.append(path)
-# path_list=path_list[:100]
+path_list=path_list[:10000]
 def resize(
     x: torch.Tensor,
     size: any or None = None,
