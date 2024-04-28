@@ -401,8 +401,8 @@ class MIXEDataset(torch.utils.data.Dataset):
         else:
             self.root1='/kaggle/working/iadd/img/content/train_p1_unlabeled'
             self.root2='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
-            self.names1=os.listdir(self.root1)[:100]
-            self.names2=os.listdir(self.root2)[:100]#[:21312]#[:63934]
+            self.names1=os.listdir(self.root1)#[:100]
+            self.names2=os.listdir(self.root2)[:21312]#[:63934]
             self.names= mergList(self.names1, self.names2)
 
         print(len(self.names))
@@ -510,24 +510,10 @@ class first_pseudo_label_dataset(torch.utils.data.Dataset):
         W_=512
         H_=512
         image_name=os.path.join(self.root,self.names[idx])
-        
+
         image = cv2.imread(image_name)
-        
-        if self.valid:
-            if random.random()<0.5:
-                combination = image
-                image= random_perspective2(
-                    combination=combination,
-                    degrees=10,
-                    translate=0.1,
-                    scale=0.25,
-                    shear=0.0
-                )
-            if random.random()<0.5:
-                augment_hsv(image)
-            if random.random() < 0.5:
-                image = np.fliplr(image)
-            
+
+
         image = cv2.resize(image, (W_, H_))
 
         # image = image[:, :, ::-1].transpose(2, 0, 1)
@@ -535,9 +521,9 @@ class first_pseudo_label_dataset(torch.utils.data.Dataset):
 
         if self.transform is not None :
             image = self.transform(image)
-          
-        return image_name,image
 
+        return image_name,image
+        
 class BDDataset(torch.utils.data.Dataset):
     '''
     Class to load the dataset
