@@ -390,7 +390,14 @@ def train_net(args):
     cuda_available = torch.cuda.is_available()
     num_gpus = torch.cuda.device_count()
     # model = net.TwinLiteNet()
-
+    transform=T.Compose([
+        T.ToTensor(),
+        T.Normalize(
+            mean=[0.485,0.456,0.406],
+            std=[0.229,0.224,0.225]
+            ),
+    
+        ])    
     pretrained=args.pretrained
     if pretrained is not None:
         model = create_seg_model('b0','bdd',weight_url=pretrained)
@@ -411,15 +418,6 @@ def train_net(args):
     # create the directory if not exist
     if not os.path.exists(args.savedir):
         os.mkdir(args.savedir)
-
-    transform=T.Compose([
-    T.ToTensor(),
-    T.Normalize(
-        mean=[0.485,0.456,0.406],
-        std=[0.229,0.224,0.225]
-    ),
-
-])
     
     # trainLoader = torch.utils.data.DataLoader(
     #     myDataLoader.MIXEDataset(transform=transform,valid=False),
