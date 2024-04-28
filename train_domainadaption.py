@@ -378,8 +378,8 @@ def pseudo_label_maker(dataloader,model):
             y_ll_pred=y_ll_pred.astype(np.uint8)*255
 
             nam=name[0].split('/')[-1]
-            da_name='/content/iadd/da/' + nam.replace('.jpg','.png')
-            ll_name='/content/iadd/ll/' + nam.replace('.jpg','.png')
+            da_name='/kaggle/working/iadd/da/' + nam.replace('.jpg','.png')
+            ll_name='/kaggle/working/iadd/ll/' + nam.replace('.jpg','.png')
 
             cv2.imwrite(da_name,y_da_pred)
             cv2.imwrite(ll_name,y_ll_pred)
