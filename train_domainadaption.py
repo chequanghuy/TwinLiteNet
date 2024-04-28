@@ -405,12 +405,12 @@ def train_net(args):
     pretrained=args.pretrained
     if pretrained is not None:
         model = create_seg_model('b0','bdd',weight_url=pretrained)
-        if args.pseudo:
-            pseudo_data = torch.utils.data.DataLoader(
-                first_pseudo_label_dataset(transform=transform, valid=False),
-                batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-            print(' pseudo label makering using the pretrained weights')
-            pseudo_label_maker(pseudo_data,model)
+        # if args.pseudo:
+            # pseudo_data = torch.utils.data.DataLoader(
+            #     first_pseudo_label_dataset(transform=transform, valid=False),
+            #     batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
+            # print(' pseudo label makering using the pretrained weights')
+            # pseudo_label_maker(pseudo_data,model)
     else:
         model = create_seg_model('b0','bdd',False)
 
