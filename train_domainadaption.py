@@ -219,7 +219,7 @@ def save_res(i,vis_idx, input, out_da, out_ll, target_da, target_ll):
 @torch.no_grad()
 def val(val_loader, model):
     
-    os.mkdir('/kaggle/working/outputs')
+    # os.mkdir('/kaggle/working/outputs')
     
     model.eval()
 
