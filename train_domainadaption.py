@@ -476,11 +476,11 @@ def train_net(args):
             start_epoch = checkpoint['epoch']
             lr=checkpoint['lr']
             model.load_state_dict(checkpoint['state_dict'])
-            if args.pseudo:
-                pseudo_data = torch.utils.data.DataLoader(
-                    first_pseudo_label_dataset(transform=transform, valid=False),
-                    batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-                pseudo_label_maker(pseudo_data,model)
+            # if args.pseudo:
+            #     pseudo_data = torch.utils.data.DataLoader(
+            #         first_pseudo_label_dataset(transform=transform, valid=False),
+            #         batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
+            #     pseudo_label_maker(pseudo_data,model)
             optimizer.load_state_dict(checkpoint['optimizer'])
             
             print("=> loaded checkpoint '{}' (epoch {})"
