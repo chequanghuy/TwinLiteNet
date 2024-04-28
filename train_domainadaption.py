@@ -312,6 +312,7 @@ def val(val_loader, model):
     da_segment_result = (da_acc_seg.avg,da_IoU_seg.avg,da_mIoU_seg.avg)
     ll_segment_result = (ll_acc_seg.avg,ll_IoU_seg.avg,ll_mIoU_seg.avg)
     return da_segment_result,ll_segment_result
+    
 def valid(mymodel,Dataset):
     '''
     Main function for trainign and validation
@@ -360,16 +361,18 @@ def pseudo_label_maker(dataloader,model):
 
 #     bch=iter(pseudo_data)
     with torch.no_grad():
-        for name, image in tbar:
+        for name, image , shape in tbar:
 #             print(name)
     #         image=cv2.imread(name)
     #         img = image.astype(np.uint8)
     #         img = cv2.resize(img, [512,512], interpolation=cv2.INTER_LINEAR)
     #         img=transform(img).unsqueeze(0).cuda()
             y_da_pred , y_ll_pred=model(image.cuda())
+            
+            H , W = shape[0] , shape[1]
+            y_da_pred=resize(y_da_pred, [H , W])
+            y_ll_pred=resize(y_ll_pred, [H , W])
 
-            y_da_pred=resize(y_da_pred, [720 ,1280])
-            y_ll_pred=resize(y_ll_pred, [720 ,1280])
 
             y_da_pred=y_da_pred[0].argmax(0).detach().cpu().numpy()
             y_ll_pred=y_ll_pred[0].argmax(0).detach().cpu().numpy()
@@ -384,6 +387,7 @@ def pseudo_label_maker(dataloader,model):
             cv2.imwrite(da_name,y_da_pred)
             cv2.imwrite(ll_name,y_ll_pred)
             tbar.set_description('pseudo relabeling: ')
+
 
 def train_net(args):
     # load the model
@@ -511,7 +515,7 @@ def train_net(args):
         pseudo_data = torch.utils.data.DataLoader(
             first_pseudo_label_dataset(transform=transform, valid=False),
             batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-        valid(model,MIXEDataset(valid=True))
+        valid(model,MIXEDataset(transform=transform , valid=True))
         pseudo_label_maker(pseudo_data,model)
 
 
