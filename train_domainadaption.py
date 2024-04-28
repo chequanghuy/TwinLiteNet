@@ -405,11 +405,12 @@ def train_net(args):
     pretrained=args.pretrained
     if pretrained is not None:
         model = create_seg_model('b0','bdd',weight_url=pretrained)
-        pseudo_data = torch.utils.data.DataLoader(
-            first_pseudo_label_dataset(transform=transform, valid=False),
-            batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-        print(' pseudo label makering using the pretrained weights')
-        pseudo_label_maker(pseudo_data,model)
+        if args.pseudo:
+            pseudo_data = torch.utils.data.DataLoader(
+                first_pseudo_label_dataset(transform=transform, valid=False),
+                batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
+            print(' pseudo label makering using the pretrained weights')
+            pseudo_label_maker(pseudo_data,model)
     else:
         model = create_seg_model('b0','bdd',False)
 
@@ -475,11 +476,13 @@ def train_net(args):
             start_epoch = checkpoint['epoch']
             lr=checkpoint['lr']
             model.load_state_dict(checkpoint['state_dict'])
-            pseudo_data = torch.utils.data.DataLoader(
-                first_pseudo_label_dataset(transform=transform, valid=False),
-                batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
+            if args.pseudo:
+                pseudo_data = torch.utils.data.DataLoader(
+                    first_pseudo_label_dataset(transform=transform, valid=False),
+                    batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
+                pseudo_label_maker(pseudo_data,model)
             optimizer.load_state_dict(checkpoint['optimizer'])
-            pseudo_label_maker(pseudo_data,model)
+            
             print("=> loaded checkpoint '{}' (epoch {})"
                 .format(args.resume, 0))
         else:
@@ -531,5 +534,6 @@ if __name__ == '__main__':
     parser.add_argument('--savedir', default='./test_', help='directory to save the results')
     parser.add_argument('--resume', type=str, default='', help='Use this flag to load last checkpoint for training')
     parser.add_argument('--pretrained', default=None, help='Pretrained ESPNetv2 weights.')
+    parser.add_argument('--pseudo', default=True, help='Pretrained ESPNetv2 weights.')
 
     train_net(parser.parse_args())
