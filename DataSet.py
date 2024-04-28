@@ -477,6 +477,7 @@ class MIXEDataset(torch.utils.data.Dataset):
         return image_name,image,(seg_da,seg_ll)
 
 
+
 class first_pseudo_label_dataset(torch.utils.data.Dataset):
     '''
     Class to load the dataset
