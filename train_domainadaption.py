@@ -16,7 +16,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
-from DataSet import MyDataset,IADDataset,MIXEDataset,BDDataset
+from DataSet import MyDataset,IADDataset,MIXEDataset,BDDataset,first_pseudo_label_dataset
 
 if not os.path.isdir('/kaggle/working/iadd/ll'):
     os.mkdir('/kaggle/working/iadd/ll')
@@ -351,35 +351,39 @@ def valid(mymodel,Dataset):
                           ll_seg_acc=ll_segment_results[0],ll_seg_iou=ll_segment_results[1],ll_seg_miou=ll_segment_results[2])
     print(msg2)
     
-def pseudo_label_maker(names,model):
+def pseudo_label_maker(dataloader,model):
     # model = create_seg_model('b0','bdd',weight_url='/kaggle/working/model_0.pth')
     model=model.cuda()
-    convert_tensor = T.ToTensor()
-    loop  = tqdm(names)
-    for name in loop:
-        image=cv2.imread(name)
-        img = image.astype(np.uint8)
-        img = cv2.resize(img, [512,512], interpolation=cv2.INTER_LINEAR)
-        img=transform(img).unsqueeze(0).cuda()
-        y_da_pred , y_ll_pred=model(img)
-        
-        y_da_pred=resize(y_da_pred, [1080, 1920])
-        y_ll_pred=resize(y_ll_pred, [1080, 1920])
-        
-        y_da_pred=y_da_pred[0].argmax(0).detach().cpu().numpy()
-        y_ll_pred=y_ll_pred[0].argmax(0).detach().cpu().numpy()
-        
-        y_da_pred=y_da_pred.astype(np.uint8)
-        y_ll_pred=y_ll_pred.astype(np.uint8)
-        
-        nam=name.split('/')[-1]
-        da_name='/kaggle/working/iadd/da/' + nam.replace('.jpg','.png')
-        ll_name='/kaggle/working/iadd/ll/' + nam.replace('.jpg','.png')
-        
-        cv2.imwrite(da_name,y_da_pred)
-        cv2.imwrite(ll_name,y_ll_pred)
-        loop.set_description('pseudo relabeling: ')
+    model.eval()
+    tbar = tqdm(dataloader)
+#     loop  = tqdm(names)
 
+#     bch=iter(pseudo_data)
+    with torch.no_grad():
+        for name, image in tbar:
+#             print(name)
+    #         image=cv2.imread(name)
+    #         img = image.astype(np.uint8)
+    #         img = cv2.resize(img, [512,512], interpolation=cv2.INTER_LINEAR)
+    #         img=transform(img).unsqueeze(0).cuda()
+            y_da_pred , y_ll_pred=model(image.cuda())
+
+            y_da_pred=resize(y_da_pred, [720 ,1280])
+            y_ll_pred=resize(y_ll_pred, [720 ,1280])
+
+            y_da_pred=y_da_pred[0].argmax(0).detach().cpu().numpy()
+            y_ll_pred=y_ll_pred[0].argmax(0).detach().cpu().numpy()
+
+            y_da_pred=y_da_pred.astype(np.uint8)*255
+            y_ll_pred=y_ll_pred.astype(np.uint8)*255
+
+            nam=name[0].split('/')[-1]
+            da_name='/content/iadd/da/' + nam.replace('.jpg','.png')
+            ll_name='/content/iadd/ll/' + nam.replace('.jpg','.png')
+
+            cv2.imwrite(da_name,y_da_pred)
+            cv2.imwrite(ll_name,y_ll_pred)
+            tbar.set_description('pseudo relabeling: ')
 
 def train_net(args):
     # load the model
@@ -390,8 +394,11 @@ def train_net(args):
     pretrained=args.pretrained
     if pretrained is not None:
         model = create_seg_model('b0','bdd',weight_url=pretrained)
+        pseudo_data = torch.utils.data.DataLoader(
+            first_pseudo_label_dataset(transform=transform, valid=False),
+            batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
         print(' pseudo label makering using the pretrained weights')
-        pseudo_label_maker(path_list,model)
+        pseudo_label_maker(pseudo_data,model)
     else:
         model = create_seg_model('b0','bdd',False)
 
@@ -424,12 +431,12 @@ def train_net(args):
     #     batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     trainLoader = torch.utils.data.DataLoader(
-        BDDataset(transform=transform,valid=False),
+        MIXEDataset(transform=transform,valid=False),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
 
 
     valLoader = torch.utils.data.DataLoader(
-        BDDataset(valid=True),
+        MIXEDataset(valid=True),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     if cuda_available:
@@ -466,8 +473,11 @@ def train_net(args):
             start_epoch = checkpoint['epoch']
             lr=checkpoint['lr']
             model.load_state_dict(checkpoint['state_dict'])
+            pseudo_data = torch.utils.data.DataLoader(
+                first_pseudo_label_dataset(transform=transform, valid=False),
+                batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
             optimizer.load_state_dict(checkpoint['optimizer'])
-            pseudo_label_maker(path_list,model)
+            pseudo_label_maker(pseudo_data,model)
             print("=> loaded checkpoint '{}' (epoch {})"
                 .format(args.resume, 0))
         else:
@@ -499,9 +509,12 @@ def train_net(args):
             'lr': lr
         }, args.savedir + 'checkpoint.pth.tar')
 
-        Dataset0= IADDataset(transform=transform , valid=True)
-        valid(model,Dataset0)
-        pseudo_label_maker(path_list,model)
+        # Dataset0= MIXEDataset(transform=transform , valid=True)
+        pseudo_data = torch.utils.data.DataLoader(
+            first_pseudo_label_dataset(transform=transform, valid=False),
+            batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
+        valid(model,MIXEDataset(valid=True))
+        pseudo_label_maker(pseudo_data,model)
 
 
 if __name__ == '__main__':
