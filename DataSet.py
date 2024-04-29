@@ -557,7 +557,7 @@ class first_pseudo_label_dataset2(torch.utils.data.Dataset):
         image_name = os.path.join(self.root, self.names[idx])
 
         image = cv2.imread(image_name)
-
+        shape = image.shape
         image = cv2.resize(image, (W_, H_))
 
         # image = image[:, :, ::-1].transpose(2, 0, 1)
@@ -566,7 +566,7 @@ class first_pseudo_label_dataset2(torch.utils.data.Dataset):
         if self.transform is not None:
             image = self.transform(image)
 
-        return image_name, image
+        return image_name, image, shape
 
 class BDDataset(torch.utils.data.Dataset):
     '''
