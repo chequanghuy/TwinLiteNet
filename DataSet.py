@@ -540,7 +540,7 @@ class first_pseudo_label_dataset2(torch.utils.data.Dataset):
         if valid:
             self.root = None
         else:
-            self.root = '/content/data/bdd100k/bdd100k/images/100k/train'
+            self.root = '/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
             self.names = os.listdir(self.root)[:10000]
 
     def __len__(self):
