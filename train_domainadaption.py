@@ -10,7 +10,7 @@ from argparse import ArgumentParser
 from utils import train, valid, netParams, save_checkpoint, poly_lr_scheduler, pseudo_label_maker
 import torch.optim.lr_scheduler
 from torchvision.transforms import transforms as T
-from DataSet import MyDataset,IADDataset,MIXEDataset,BDDataset,first_pseudo_label_dataset
+from DataSet import MyDataset,IADDataset,MIXEDataset,BDDataset,first_pseudo_label_dataset,first_pseudo_label_dataset2
 from efficientvit.seg_model_zoo import create_seg_model
 from loss import TotalLoss
 import os
@@ -33,7 +33,7 @@ def train_net(args):
         model = create_seg_model('b0','bdd',weight_url=pretrained)
         if args.pseudo == True:
             pseudo_data = torch.utils.data.DataLoader(
-                first_pseudo_label_dataset(transform=transform, valid=False),
+                first_pseudo_label_dataset2(transform=transform, valid=False),
                 batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
             print(' pseudo label makering using the pretrained weights')
             pseudo_label_maker(pseudo_data,model)
@@ -73,7 +73,7 @@ def train_net(args):
             model.load_state_dict(checkpoint['state_dict'])
             if args.pseudo == True:
                 pseudo_data = torch.utils.data.DataLoader(
-                    first_pseudo_label_dataset(transform=transform, valid=False),
+                    first_pseudo_label_dataset2(transform=transform, valid=False),
                     batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
                 print(f'making pseudo labels for epoch {start_epoch}')
                 pseudo_label_maker(pseudo_data,model)
@@ -87,7 +87,7 @@ def train_net(args):
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     trainLoader = torch.utils.data.DataLoader(
-        MIXEDataset(transform=transform,valid=False),
+        BDDataset(transform=transform,valid=False),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
 
 

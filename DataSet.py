@@ -176,7 +176,7 @@ class MyDataset(torch.utils.data.Dataset):
         W_=512
         H_=512
         image_name=os.path.join(self.root,self.names[idx])
-        
+
         image = cv2.imread(image_name)
         label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
         label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
@@ -196,7 +196,7 @@ class MyDataset(torch.utils.data.Dataset):
                 image = np.fliplr(image)
                 label1 = np.fliplr(label1)
                 label2 = np.fliplr(label2)
-            
+
         label1 = cv2.resize(label1, (W_, H_))
         label2 = cv2.resize(label2, (W_, H_))
         image = cv2.resize(image, (W_, H_))
@@ -217,7 +217,7 @@ class MyDataset(torch.utils.data.Dataset):
 
         if self.transform is not None :
             image = self.transform(image)
-          
+
         return image_name,image,(seg_da,seg_ll)
 
 
@@ -254,7 +254,7 @@ class My_test_Dataset(torch.utils.data.Dataset):
         W_=512
         H_=512
         image_name=os.path.join(self.root,self.names[idx])
-        
+
         image = cv2.imread(image_name)
         label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
         label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
@@ -274,7 +274,7 @@ class My_test_Dataset(torch.utils.data.Dataset):
                 image = np.fliplr(image)
                 label1 = np.fliplr(label1)
                 label2 = np.fliplr(label2)
-            
+
         label1 = cv2.resize(label1, (W_, H_))
         label2 = cv2.resize(label2, (W_, H_))
         image = cv2.resize(image, (W_, H_))
@@ -295,7 +295,7 @@ class My_test_Dataset(torch.utils.data.Dataset):
 
         if self.transform is not None :
             image = self.transform(image)
-          
+
         return image_name,image,(seg_da,seg_ll)
 
 class IADDataset(torch.utils.data.Dataset):
@@ -331,14 +331,14 @@ class IADDataset(torch.utils.data.Dataset):
         W_=512
         H_=512
         image_name=os.path.join(self.root,self.names[idx])
-        
+
         image = cv2.imread(image_name)
         if self.valid:
             label1 = cv2.imread(image_name.replace("img","drivable").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)  
+            label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)
         else:
             label1 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","da").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","ll").replace(".jpg",".png"), 0)   
+            label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","ll").replace(".jpg",".png"), 0)
         if not self.valid:
             if random.random()<0.5:
                 combination = (image, label1, label2)
@@ -355,7 +355,7 @@ class IADDataset(torch.utils.data.Dataset):
                 image = np.fliplr(image)
                 label1 = np.fliplr(label1)
                 label2 = np.fliplr(label2)
-            
+
         label1 = cv2.resize(label1, (W_, H_))
         label2 = cv2.resize(label2, (W_, H_))
         image = cv2.resize(image, (W_, H_))
@@ -376,7 +376,7 @@ class IADDataset(torch.utils.data.Dataset):
 
         if self.transform is not None :
             image = self.transform(image)
-          
+
         return image_name,image,(seg_da,seg_ll)
 
 
@@ -422,19 +422,19 @@ class MIXEDataset(torch.utils.data.Dataset):
             image_name=os.path.join(self.root1,self.names[idx])
             image = cv2.imread(image_name)
             label1 = cv2.imread(image_name.replace("img","drivable").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)   
+            label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)
         else:
             if idx%2==1:
                 image_name=os.path.join(self.root1,self.names[idx])
                 image = cv2.imread(image_name)
                 label1 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","da").replace(".jpg",".png"), 0)
-                label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","ll").replace(".jpg",".png"), 0)    
+                label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","ll").replace(".jpg",".png"), 0)
             else:
                 image_name=os.path.join(self.root2,self.names[idx])
                 image = cv2.imread(image_name)
                 label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
                 label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
-    
+
 
         if not self.valid:
             if random.random()<0.5:
@@ -522,7 +522,52 @@ class first_pseudo_label_dataset(torch.utils.data.Dataset):
             image = self.transform(image)
 
         return image_name,image,shape
-        
+class first_pseudo_label_dataset2(torch.utils.data.Dataset):
+    '''
+    Class to load the dataset
+    '''
+
+    def __init__(self, transform=None, valid=False):
+        '''
+        :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
+        :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
+        :param transform: Type of transformation. SEe Transforms.py for supported transformations
+        '''
+
+        self.transform = transform
+        self.Tensor = T.ToTensor()
+        self.valid = valid
+        if valid:
+            self.root = None
+        else:
+            self.root = '/content/data/bdd100k/bdd100k/images/100k/train'
+            self.names = os.listdir(self.root)[:10000]
+
+    def __len__(self):
+        return len(self.names)
+
+    def __getitem__(self, idx):
+        '''
+
+        :param idx: Index of the image file
+        :return: returns the image and corresponding label file.
+        '''
+        W_ = 512
+        H_ = 512
+        image_name = os.path.join(self.root, self.names[idx])
+
+        image = cv2.imread(image_name)
+
+        image = cv2.resize(image, (W_, H_))
+
+        # image = image[:, :, ::-1].transpose(2, 0, 1)
+        image = np.ascontiguousarray(image)
+
+        if self.transform is not None:
+            image = self.transform(image)
+
+        return image_name, image
+
 class BDDataset(torch.utils.data.Dataset):
     '''
     Class to load the dataset
@@ -556,14 +601,14 @@ class BDDataset(torch.utils.data.Dataset):
         W_=512
         H_=512
         image_name=os.path.join(self.root,self.names[idx])
-        
+
         image = cv2.imread(image_name)
         if self.valid:
             label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
-            label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0) 
+            label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
         else:
             label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train","working/iadd/da").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train","working/iadd/ll").replace(".jpg",".png"), 0)   
+            label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train","working/iadd/ll").replace(".jpg",".png"), 0)
         if not self.valid:
             if random.random()<0.5:
                 combination = (image, label1, label2)
@@ -580,7 +625,7 @@ class BDDataset(torch.utils.data.Dataset):
                 image = np.fliplr(image)
                 label1 = np.fliplr(label1)
                 label2 = np.fliplr(label2)
-            
+
         label1 = cv2.resize(label1, (W_, H_))
         label2 = cv2.resize(label2, (W_, H_))
         image = cv2.resize(image, (W_, H_))
@@ -601,6 +646,6 @@ class BDDataset(torch.utils.data.Dataset):
 
         if self.transform is not None :
             image = self.transform(image)
-          
+
         return image_name,image,(seg_da,seg_ll)
 
