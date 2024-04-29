@@ -16,6 +16,8 @@ from DataSet import MyDataset, IADDataset, MIXEDataset, BDDataset, first_pseudo_
 from efficientvit.seg_model_zoo import create_seg_model
 from loss import TotalLoss
 import os
+import torch.backends.cudnn as cudnn
+
 
 
 def train_net(args):
