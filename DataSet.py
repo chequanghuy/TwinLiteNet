@@ -535,7 +535,7 @@ class first_pseudo_label_dataset2(torch.utils.data.Dataset):
         '''
 
         self.transform = transform
-        self.Tensor = T.ToTensor()
+        self.Tensor = transforms.ToTensor()
         self.valid = valid
         if valid:
             self.root = None
