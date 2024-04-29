@@ -433,15 +433,6 @@ def train_net(args):
     #     myDataLoader.MIXEDataset(valid=True),
     #     batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
-    trainLoader = torch.utils.data.DataLoader(
-        MIXEDataset(transform=transform,valid=False),
-        batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
-
-
-    valLoader = torch.utils.data.DataLoader(
-        MIXEDataset(valid=True),
-        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
-
     if cuda_available:
         args.onGPU = True
         model = model.cuda()
@@ -488,7 +479,14 @@ def train_net(args):
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
+    trainLoader = torch.utils.data.DataLoader(
+        MIXEDataset(transform=transform,valid=False),
+        batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
 
+
+    valLoader = torch.utils.data.DataLoader(
+        MIXEDataset(valid=True),
+        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     for epoch in range(start_epoch, args.max_epochs):
 
