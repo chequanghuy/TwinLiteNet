@@ -19,13 +19,30 @@ from torchvision.transforms import transforms as T
 from efficientvit.seg_model_zoo import create_seg_model
 
 from loss import TotalLoss
+from efficientvit.models.efficientvit.seg import SegHead
 
+head = SegHead(
+            fid_list=["stage4", "stage3", "stage2"],
+            in_channel_list=[128, 64, 32],
+            stride_list=[64, 32, 16, 8],
+            head_stride=4,
+            head_width=32,
+            head_depth=1,
+            expand_ratio=4,
+            middle_op="mbconv",
+            final_expand=4,
+            n_classes=2,
+        )
 def train_net(args):
     # load the model
     cuda_available = torch.cuda.is_available()
     num_gpus = torch.cuda.device_count()
     # model = net.TwinLiteNet()
-    model = create_seg_model('b0','bdd',False)
+    # model = create_seg_model('b0','bdd',False)
+    if args.pretrained is not None:
+        model = create_seg_model('b0', 'bdd', weight_url=args.pretrained)
+    else:
+        model = create_seg_model('b0', 'bdd', False)
 
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
@@ -58,6 +75,7 @@ def train_net(args):
         args.onGPU = True
         model = model.cuda()
         cudnn.benchmark = True
+
     # for param in model.parameters():
     #
     # param.requires_grad = False
@@ -87,6 +105,8 @@ def train_net(args):
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
+    model.head1 = head
+    model.head2 = head
 
     for epoch in range(start_epoch, args.max_epochs):
 
@@ -98,6 +118,7 @@ def train_net(args):
 
         # train for one epoch
         model.train()
+        model.backbone.required_grad = False
         train( args, trainLoader, model, criteria, optimizer, epoch)
         # model.eval()
         # # validation
