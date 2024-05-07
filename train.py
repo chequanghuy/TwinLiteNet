@@ -66,7 +66,7 @@ def train_net(args):
     # for param in model.head2.parameters():
     # param.requires_grad = True
     #
-    print('Total network parameters: ' + str(total_paramters))
+    # print('Total network parameters: ' + str(total_paramters))
 
     criteria = TotalLoss()
 
