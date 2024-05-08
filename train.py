@@ -5,6 +5,7 @@ sys.path.insert(1, os.path.join(sys.path[0], '/kaggle/working/efficientvit'))
 ######
 import torch
 import pickle
+import copy
 from model import TwinLite as net
 import torch.backends.cudnn as cudnn
 import DataSet as myDataLoader
@@ -93,8 +94,8 @@ def train_net(args):
 
     optimizer = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
 
-    model.head1 = head.cuda()
-    model.head2 = head.cuda()
+    # model.head1 = copy.deepcopy(head).cuda()
+    # model.head2 = copy.deepcopy(head).cuda()
 
     if args.resume:
         if os.path.isfile(args.resume):
