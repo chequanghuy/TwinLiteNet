@@ -35,6 +35,7 @@ def train_net(args):
 
     ])
     pretrained = args.pretrained
+    engine = args.engine
     if pretrained is not None:
         model = create_seg_model('b0', 'bdd', weight_url=pretrained)
 
@@ -80,17 +81,17 @@ def train_net(args):
 
 
     # iadd_valLoader = torch.utils.data.DataLoader(
-    iadd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin='colab', data='IADD')
+    iadd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='IADD')
         # batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     # bdd_valLoader = torch.utils.data.DataLoader(
-    bdd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin='colab', data='bdd')
+    bdd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='bdd')
         # batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     source_loader = torch.utils.data.DataLoader(
-        myDataLoader.MyDataset(transform=transform, valid=False, engin='colab', data='bdd'),
+        myDataLoader.MyDataset(transform=transform, valid=False, engin=engine, data='bdd'),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True, drop_last=True)
 
     target_loader = torch.utils.data.DataLoader(
-        myDataLoader.UlabeledDataset(transform=transform, engin='colab',data='IADD'),
+        myDataLoader.UlabeledDataset(transform=transform, engin=engine,data='IADD'),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True, drop_last=True)
     # valid(model, bdd_valLoader)
     # valid(model, iadd_valLoader)
@@ -140,5 +141,6 @@ if __name__ == '__main__':
     parser.add_argument('--resume', type=str, default='', help='Use this flag to load last checkpoint for training')
     parser.add_argument('--pretrained', default=None, help='Pretrained ESPNetv2 weights.')
     parser.add_argument('--pseudo', default=True, help='Pretrained ESPNetv2 weights.')
+    parser.add_argument('--engine', default='kaggle', help='choose youre prefered engine, kaggle or colab.')
 
     train_net(parser.parse_args())
