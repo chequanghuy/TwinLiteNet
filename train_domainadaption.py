@@ -2,7 +2,9 @@ import os
 import sys
 
 # put the directory efficientvit instead of '..'
-sys.path.insert(1, os.path.join(sys.path[0], 'content/efficientvit'))
+sys.path.insert(1, os.path.join(sys.path[0], '/content/efficientvit'))
+from efficientvit.seg_model_zoo import create_seg_model
+
 ######
 import torch
 import pickle
@@ -12,7 +14,6 @@ from utils import train, valid, netParams, save_checkpoint, poly_lr_scheduler, p
 import torch.optim.lr_scheduler
 from torchvision.transforms import transforms as T
 import DataSet as myDataLoader
-from efficientvit.seg_model_zoo import create_seg_model
 from loss import TotalLoss, DiscriminatorLoss,MMDLoss
 import os
 import torch.backends.cudnn as cudnn
