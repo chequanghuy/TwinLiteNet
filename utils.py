@@ -135,7 +135,9 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
         optimizer.zero_grad()
         source_output = model(source_input.cuda().float())
         target_output = model(target_input.cuda().float())
-
+        print('source_outputs: ',ource_output[0].shape)
+        print('source_output: ',target_output[0].shape)
+        print('source_output: ',source_label[0].shape)
         # Train discriminator
         # source_features = source_output.detach().view(source_output.size(0), -1)
         # target_features = target_output.detach().view(target_output.size(0), -1)

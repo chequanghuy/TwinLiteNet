@@ -118,13 +118,13 @@ def train_net(args):
         }, args.savedir + 'checkpoint.pth.tar')
 
         # Dataset0= MIXEDataset(transform=transform , valid=True)
-        pseudo_data = torch.utils.data.DataLoader(
-            first_pseudo_label_dataset2(transform=transform, valid=False),
-            batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
+        # pseudo_data = torch.utils.data.DataLoader(
+        #     first_pseudo_label_dataset2(transform=transform, valid=False),
+        #     batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
 
         valid(model, bdd_valLoader)
         valid(model, iadd_valLoader)
-        pseudo_label_maker(pseudo_data, model)
+        # pseudo_label_maker(pseudo_data, model)
 
 
 if __name__ == '__main__':
