@@ -2,7 +2,7 @@ import os
 import sys
 
 # put the directory efficientvit instead of '..'
-sys.path.insert(1, os.path.join(sys.path[0], '/content/efficientvit'))
+sys.path.insert(1, os.path.join(sys.path[0], '/kaggle/working/efficientvit'))
 from efficientvit.seg_model_zoo import create_seg_model
 
 ######
