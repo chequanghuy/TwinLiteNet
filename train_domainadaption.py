@@ -11,8 +11,7 @@ from argparse import ArgumentParser
 from utils import train, valid, netParams, save_checkpoint, poly_lr_scheduler, pseudo_label_maker
 import torch.optim.lr_scheduler
 from torchvision.transforms import transforms as T
-from DataSet import MyDataset, IADDataset, MIXEDataset, BDDataset, first_pseudo_label_dataset, \
-    first_pseudo_label_dataset2
+import DataSet as myDataLoader
 from efficientvit.seg_model_zoo import create_seg_model
 from loss import TotalLoss, DiscriminatorLoss,MMDLoss
 import os
@@ -78,11 +77,13 @@ def train_net(args):
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
-    adsadsadsad(transform=transform, valid=True, engin='colab', data='IADD')
-    valLoader = torch.utils.data.DataLoader(
-        valdata,
-        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
+    iadd_valLoader = torch.utils.data.DataLoader(
+        myDataLoader.MyDataset(transform=transform, valid=True, engin='colab', data='IADD'),
+        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+    bdd_valLoader = torch.utils.data.DataLoader(
+        myDataLoader.MyDataset(transform=transform, valid=True, engin='colab', data='bdd'),
+        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     source_loader = torch.utils.data.DataLoader(
         myDataLoader.MyDataset(transform=transform, valid=False, engin='colab', data='bdd'),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
@@ -90,19 +91,21 @@ def train_net(args):
     target_loader = torch.utils.data.DataLoader(
         myDataLoader.UlabeledDataset(transform=transform, engin='colab',data='IADD'),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+    valid(model, bdd_valLoader)
+    valid(model, iadd_valLoader)
 
     for epoch in range(start_epoch, args.max_epochs):
 
         model_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
         poly_lr_scheduler(args, optimizer, epoch)
-        poly_lr_scheduler(args, disc_optimizer, epoch)
+        # poly_lr_scheduler(args, disc_optimizer, epoch)
         for param_group in optimizer.param_groups:
             lr = param_group['lr']
         print("Learning rate: " + str(lr))
         # train for one epoch
         model = model.cuda()
-        disc_model = disc_model.cuda()
-        train(args, source_loader, target_loader, model, disc_model, criteria, criterion_mmd, optimizer, epoch,device='cuda')
+        # disc_model = disc_model.cuda()
+        train(args, source_loader, target_loader, model, criteria, criterion_mmd, optimizer, epoch)
 
         torch.save(model.state_dict(), model_file_name)
 
@@ -117,7 +120,9 @@ def train_net(args):
         pseudo_data = torch.utils.data.DataLoader(
             first_pseudo_label_dataset2(transform=transform, valid=False),
             batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-        valid(model, valLoader)
+
+        valid(model, bdd_valLoader)
+        valid(model, iadd_valLoader)
         pseudo_label_maker(pseudo_data, model)
 
 

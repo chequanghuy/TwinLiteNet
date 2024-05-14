@@ -117,10 +117,9 @@ def poly_lr_scheduler(args, optimizer, epoch, power=2):
     return lr
 
 
-def train(args, source_loader, target_loader, model, disc_model, criterion, criterion_mmd, optimizer, epoch,
-          device='cuda'):
+def train(args, source_loader, target_loader, model, criterion, criterion_mmd, optimizer, epoch):
     model.train()
-    disc_model.train()
+    # disc_model.train()
 
     total_batches = len(source_loader)
     pbar = enumerate(zip(source_loader, target_loader))
