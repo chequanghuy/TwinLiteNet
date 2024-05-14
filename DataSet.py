@@ -149,7 +149,7 @@ class MyDataset(torch.utils.data.Dataset):
                     self.names = os.listdir(self.root)
                 else:
                     self.root = '/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
-                    self.names = os.listdir(self.root)[:1500]  # [:1000]
+                    self.names = os.listdir(self.root)#[:1500]  # [:1000]
             else:                       #bdd dataset on colab engine
                 if valid:
                     self.root = '/content/data/bdd100k/bdd100k/images/100k/val'
@@ -164,7 +164,7 @@ class MyDataset(torch.utils.data.Dataset):
                     self.names = os.listdir(self.root)
                 else:
                     self.root = '/kaggle/working/iadd/img/content/train_p1_unlabeled'
-                    self.names = os.listdir(self.root)[:1000]
+                    self.names = os.listdir(self.root)#[:1000]
             else:                        #IADD dataset on colab engine
                 if valid:
                     self.root = '/content/IADD/IADDv6/val/img'

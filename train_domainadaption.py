@@ -88,11 +88,11 @@ def train_net(args):
         # batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     source_loader = torch.utils.data.DataLoader(
         myDataLoader.MyDataset(transform=transform, valid=False, engin=engine, data='bdd'),
-        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True, drop_last=True)
+        batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
 
     target_loader = torch.utils.data.DataLoader(
         myDataLoader.UlabeledDataset(transform=transform, engin=engine,data='IADD'),
-        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True, drop_last=True)
+        batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
     # valid(model, bdd_valLoader)
     # valid(model, iadd_valLoader)
 
