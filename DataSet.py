@@ -171,7 +171,7 @@ class MyDataset(torch.utils.data.Dataset):
                     self.names = os.listdir(self.root)
                 else:
                     self.root = '/content/iadd/img/content/train_p1_unlabeled'
-                    self.names = os.listdir(self.root)
+                    self.names = os.listdir(self.root)[:1000]
 
 
     def __len__(self):
