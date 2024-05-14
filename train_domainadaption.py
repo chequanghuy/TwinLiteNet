@@ -87,11 +87,11 @@ def train_net(args):
         # batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     source_loader = torch.utils.data.DataLoader(
         myDataLoader.MyDataset(transform=transform, valid=False, engin='colab', data='bdd'),
-        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True, drop_last=True)
 
     target_loader = torch.utils.data.DataLoader(
         myDataLoader.UlabeledDataset(transform=transform, engin='colab',data='IADD'),
-        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True, drop_last=True)
     # valid(model, bdd_valLoader)
     # valid(model, iadd_valLoader)
 
@@ -122,8 +122,9 @@ def train_net(args):
         #     first_pseudo_label_dataset2(transform=transform, valid=False),
         #     batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
 
-        valid(model, bdd_valLoader)
         valid(model, iadd_valLoader)
+        valid(model, bdd_valLoader)
+
         # pseudo_label_maker(pseudo_data, model)
 
 

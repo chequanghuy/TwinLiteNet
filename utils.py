@@ -21,7 +21,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
-
+from itertools import cycle
 
 def resize(
         x: torch.Tensor,
@@ -118,11 +118,12 @@ def poly_lr_scheduler(args, optimizer, epoch, power=2):
 
 
 def train(args, source_loader, target_loader, model, criterion, criterion_mmd, optimizer, epoch):
+
     model.train()
     # disc_model.train()
 
     total_batches = len(source_loader)
-    pbar = enumerate(zip(source_loader, target_loader))
+    pbar = enumerate(zip(source_loader, cycle(target_loader)))
     LOGGER.info(('\n' + '%13s' * 4) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'TotalLoss'))
     pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
     for i, (source_data, target_data) in pbar:

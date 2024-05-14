@@ -156,7 +156,7 @@ class MyDataset(torch.utils.data.Dataset):
                     self.names = os.listdir(self.root)
                 else:
                     self.root = '/content/data/bdd100k/bdd100k/images/100k/train'
-                    self.names = os.listdir(self.root)[:1000]
+                    self.names = os.listdir(self.root)[:10000]
         elif self.data == 'IADD':
             if self.engin == 'kaggle':  #IADD dataset on kaggle engine
                 if valid:
