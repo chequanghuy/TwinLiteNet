@@ -133,8 +133,8 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
             # source_label = source_label.cuda()
             # target_input = target_input.cuda().float()
         optimizer.zero_grad()
-        source_output = model(source_input)
-        target_output = model(target_input)
+        source_output = model(source_input.cuda().float())
+        target_output = model(target_input.cuda().float())
 
         # Train discriminator
         # source_features = source_output.detach().view(source_output.size(0), -1)
