@@ -2,7 +2,7 @@ import os
 import sys
 
 # put the directory efficientvit instead of '..'
-sys.path.insert(1, os.path.join(sys.path[0], '/kaggle/working/efficientvit'))
+sys.path.insert(1, os.path.join(sys.path[0], 'content/efficientvit'))
 ######
 import torch
 import pickle
