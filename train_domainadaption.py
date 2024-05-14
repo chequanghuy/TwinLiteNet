@@ -92,8 +92,8 @@ def train_net(args):
     target_loader = torch.utils.data.DataLoader(
         myDataLoader.UlabeledDataset(transform=transform, engin='colab',data='IADD'),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
-    valid(model, bdd_valLoader)
-    valid(model, iadd_valLoader)
+    # valid(model, bdd_valLoader)
+    # valid(model, iadd_valLoader)
 
     for epoch in range(start_epoch, args.max_epochs):
 

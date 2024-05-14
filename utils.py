@@ -128,10 +128,10 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
     for i, (source_data, target_data) in pbar:
         (_, source_input, source_label) = source_data
         (_, target_input,_) = target_data
-        if args.onGPU == True:
-            source_input = source_input.cuda().float()
-            source_label = source_label.cuda()
-            target_input = target_input.cuda().float()
+        # if args.onGPU == True:
+            # source_input = source_input.cuda().float()
+            # source_label = source_label.cuda()
+            # target_input = target_input.cuda().float()
         optimizer.zero_grad()
         source_output = model(source_input)
         target_output = model(target_input)
