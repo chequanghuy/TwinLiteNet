@@ -259,7 +259,7 @@ def val(val_loader, model):
     return da_segment_result, ll_segment_result
 
 
-def valid(mymodel, valLoader):
+def valid(mymodel, Dataset):
     '''
     Main function for trainign and validation
     :param args: global arguments
@@ -274,9 +274,9 @@ def valid(mymodel, valLoader):
         model = model.cuda()
         cudnn.benchmark = True
 
-    # valLoader = torch.utils.data.DataLoader(
-    #     Dataset,
-    #     batch_size=2, shuffle=False, num_workers=1, pin_memory=True)
+    valLoader = torch.utils.data.DataLoader(
+        Dataset,
+        batch_size=2, shuffle=False, num_workers=1, pin_memory=True)
 
     total_paramters = netParams(model)
     print('Total network parameters: ' + str(total_paramters))

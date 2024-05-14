@@ -79,12 +79,12 @@ def train_net(args):
             print("=> no checkpoint found at '{}'".format(args.resume))
 
 
-    iadd_valLoader = torch.utils.data.DataLoader(
-        myDataLoader.MyDataset(transform=transform, valid=True, engin='colab', data='IADD'),
-        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
-    bdd_valLoader = torch.utils.data.DataLoader(
-        myDataLoader.MyDataset(transform=transform, valid=True, engin='colab', data='bdd'),
-        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+    # iadd_valLoader = torch.utils.data.DataLoader(
+    iadd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin='colab', data='IADD')
+        # batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+    # bdd_valLoader = torch.utils.data.DataLoader(
+    bdd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin='colab', data='bdd')
+        # batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     source_loader = torch.utils.data.DataLoader(
         myDataLoader.MyDataset(transform=transform, valid=False, engin='colab', data='bdd'),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
