@@ -14,11 +14,12 @@ from torchvision.transforms import transforms as T
 from DataSet import MyDataset, IADDataset, MIXEDataset, BDDataset, first_pseudo_label_dataset, \
     first_pseudo_label_dataset2
 from efficientvit.seg_model_zoo import create_seg_model
-from loss import TotalLoss
+from loss import TotalLoss, DiscriminatorLoss,MMDLoss
 import os
 import torch.backends.cudnn as cudnn
-
-
+from model.Discriminator import Discriminator
+import torch.nn.functional as F
+import  torch.nn as nn
 
 def train_net(args):
     # load the model
@@ -36,18 +37,11 @@ def train_net(args):
     pretrained = args.pretrained
     if pretrained is not None:
         model = create_seg_model('b0', 'bdd', weight_url=pretrained)
-        # if args.pseudo:
-        #     pseudo_data = torch.utils.data.DataLoader(
-        #         first_pseudo_label_dataset2(transform=transform, valid=False),
-        #         batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-        #     print(' pseudo label makering using the pretrained weights')
-        # #     pseudo_label_maker(pseudo_data, model)
-        # else:
-        #     print('pseudo labels are already made')
+
+
     else:
         model = create_seg_model('b0', 'bdd', False)
-
-    # pseudo_label_maker(path_list,model)
+    # disc_model =
     if num_gpus > 1:
         model = torch.nn.DataParallel(model)
 
@@ -63,11 +57,13 @@ def train_net(args):
         cudnn.benchmark = True
 
     criteria = TotalLoss()
-
+    criterion_mmd = MMDLoss()
     start_epoch = 0
     lr = args.lr
 
     optimizer = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
+    # disc_optimizer = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
+
 
     if args.resume:
         if os.path.isfile(args.resume):
@@ -76,43 +72,37 @@ def train_net(args):
             start_epoch = checkpoint['epoch']
             lr = checkpoint['lr']
             model.load_state_dict(checkpoint['state_dict'])
-            if args.pseudo:
-                pseudo_data = torch.utils.data.DataLoader(
-                    first_pseudo_label_dataset2(transform=transform, valid=False),
-                    batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-                print(f'making pseudo labels for epoch {start_epoch}')
-                pseudo_label_maker(pseudo_data, model)
-            else:
-                print('pseudo labels are already made')
-            optimizer.load_state_dict(checkpoint['optimizer'])
 
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.resume, 0))
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
-    trainLoader = torch.utils.data.DataLoader(
-        BDDataset(transform=transform, valid=False),
-        batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
-
+    adsadsadsad(transform=transform, valid=True, engin='colab', data='IADD')
     valLoader = torch.utils.data.DataLoader(
-        MIXEDataset(valid=True),
+        valdata,
+        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+
+    source_loader = torch.utils.data.DataLoader(
+        myDataLoader.MyDataset(transform=transform, valid=False, engin='colab', data='bdd'),
+        batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+
+    target_loader = torch.utils.data.DataLoader(
+        myDataLoader.UlabeledDataset(transform=transform, engin='colab',data='IADD'),
         batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     for epoch in range(start_epoch, args.max_epochs):
 
         model_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
         poly_lr_scheduler(args, optimizer, epoch)
+        poly_lr_scheduler(args, disc_optimizer, epoch)
         for param_group in optimizer.param_groups:
             lr = param_group['lr']
         print("Learning rate: " + str(lr))
-
         # train for one epoch
-        model.train()
-        train(args, trainLoader, model, criteria, optimizer, epoch)
-        # model.eval()
-        # # validation
-        # da_segment_results , ll_segment_results = val(valLoader, model)
+        model = model.cuda()
+        disc_model = disc_model.cuda()
+        train(args, source_loader, target_loader, model, disc_model, criteria, criterion_mmd, optimizer, epoch,device='cuda')
 
         torch.save(model.state_dict(), model_file_name)
 
@@ -127,7 +117,7 @@ def train_net(args):
         pseudo_data = torch.utils.data.DataLoader(
             first_pseudo_label_dataset2(transform=transform, valid=False),
             batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-        valid(model, BDDataset(transform=transform, valid=True))
+        valid(model, valLoader)
         pseudo_label_maker(pseudo_data, model)
 
 

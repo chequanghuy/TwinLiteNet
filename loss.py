@@ -12,10 +12,72 @@ from utils import resize
 from const import *
 
 
+class DiscriminatorLoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.discriminator_da = nn.BCELoss()
+        self.discriminator_ll = nn.BCELoss()
+
+    def forward(self, outputs, targets):
+        seg_da_fea, seg_ll_fea = targets
+        out_da_fea, out_ll_fea = outputs
+
+        da_disc_loss = self.discriminator_da(out_da_fea, seg_da_fea)
+        ll_disc_loss = self.discriminator_ll(out_ll_fea, seg_ll_fea)
+
+        total_discriminator = da_disc_loss + ll_disc_loss
+        return total_discriminator
+
+
+class MMDLoss(nn.Module):
+
+    def __init__(self, kernel_type='rbf', kernel_mul=2.0, kernel_num=5):
+        super(MMDLoss, self).__init__()
+        self.kernel_num = kernel_num
+        self.kernel_mul = kernel_mul
+        self.fix_sigma = None
+        self.kernel_type = kernel_type
+
+    def gaussian_kernel(self, source, target, kernel_mul, kernel_num, fix_sigma):
+        n_samples = int(source.size()[0]) + int(target.size()[0])
+        total = torch.cat([source, target], dim=0)
+
+        total0 = total.unsqueeze(0).expand(int(total.size(0)), int(total.size(0)), int(total.size(1)))
+        total1 = total.unsqueeze(1).expand(int(total.size(0)), int(total.size(0)), int(total.size(1)))
+        L2_distance = ((total0 - total1) ** 2).sum(2)
+
+        if fix_sigma:
+            bandwidth = fix_sigma
+        else:
+            bandwidth = torch.sum(L2_distance.data) / (n_samples ** 2 - n_samples)
+
+        bandwidth /= kernel_mul ** (kernel_num // 2)
+        bandwidth_list = [bandwidth * (kernel_mul ** i) for i in range(kernel_num)]
+        kernel_val = [torch.exp(-L2_distance / bandwidth_temp) for bandwidth_temp in bandwidth_list]
+        return sum(kernel_val)
+
+    def forward(self, source, target):
+        batch_size = int(source.size()[0])
+        source = source.view(batch_size, -1)  # Flatten the source feature maps
+        target = target.view(batch_size, -1)  # Flatten the target feature maps
+        kernels = self.gaussian_kernel(source, target, kernel_mul=self.kernel_mul, kernel_num=self.kernel_num,
+                                       fix_sigma=self.fix_sigma)
+
+        XX = kernels[:batch_size, :batch_size]
+        YY = kernels[batch_size:, batch_size:]
+        XY = kernels[:batch_size, batch_size:]
+        YX = kernels[batch_size:, :batch_size]
+
+        loss = torch.mean(XX + YY - XY - YX)
+        return loss
+
+
 class TotalLoss(nn.Module):
     '''
     This file defines a cross entropy loss for 2D images
     '''
+
     def __init__(self):
         '''
         :param weight: 1D weight vector to deal with the class-imbalance
@@ -26,32 +88,27 @@ class TotalLoss(nn.Module):
         self.ce_loss_history = []
         self.tvk_loss_history = []
 
-        self.seg_tver_da = TverskyLoss(mode="multiclass", alpha=0.7, beta=0.3, gamma=4.0/3, from_logits=True)
-        self.seg_tver_ll = TverskyLoss(mode="multiclass", alpha=0.9, beta=0.1, gamma=4.0/3, from_logits=True)
+        self.seg_tver_da = TverskyLoss(mode="multiclass", alpha=0.7, beta=0.3, gamma=4.0 / 3, from_logits=True)
+        self.seg_tver_ll = TverskyLoss(mode="multiclass", alpha=0.9, beta=0.1, gamma=4.0 / 3, from_logits=True)
         self.seg_focal = FocalLossSeg(mode="multiclass", alpha=0.25)
         # self.seg_criterion3 = FocalLossSeg(mode="multiclass", alpha=1)
 
-
-
     def forward(self, outputs, targets):
-        
-        seg_da,seg_ll=targets
-        out_da,out_ll=outputs
+        seg_da, seg_ll = targets
+        out_da, out_ll = outputs
 
-        _,seg_da= torch.max(seg_da, 1)
-        seg_da=seg_da.cuda()
+        _, seg_da = torch.max(seg_da, 1)
+        seg_da = seg_da.cuda()
 
-        _,seg_ll= torch.max(seg_ll, 1)
-        seg_ll=seg_ll.cuda()
+        _, seg_ll = torch.max(seg_ll, 1)
+        seg_ll = seg_ll.cuda()
 
+        tversky_loss = self.seg_tver_da(out_da, seg_da) + self.seg_tver_ll(out_ll, seg_ll)
+        focal_loss = self.seg_focal(out_ll, seg_ll) + self.seg_focal(out_da, seg_da)
 
-        tversky_loss = self.seg_tver_da(out_da, seg_da)+self.seg_tver_ll(out_ll, seg_ll)
-        focal_loss = self.seg_focal(out_ll, seg_ll)+self.seg_focal(out_da, seg_da)
-
-
-        loss = focal_loss+tversky_loss
+        loss = focal_loss + tversky_loss
         # print(loss1.item(),skyl1.item(),loss2.item(),skyl2.item())
-        return focal_loss.item(),tversky_loss.item(),loss
+        return focal_loss.item(), tversky_loss.item(), loss
 
 
 def calc_iou(a, b):
@@ -67,22 +124,19 @@ def calc_iou(a, b):
     ua = torch.clamp(ua, min=1e-8)
     intersection = iw * ih
     IoU = intersection / ua
-   
 
     return IoU
 
 
-
-
 def focal_loss_with_logits(
-    output: torch.Tensor,
-    target: torch.Tensor,
-    gamma: float = 2.0,
-    alpha: Optional[float] = 0.25,
-    reduction: str = "mean",
-    normalized: bool = False,
-    reduced_threshold: Optional[float] = None,
-    eps: float = 1e-6,
+        output: torch.Tensor,
+        target: torch.Tensor,
+        gamma: float = 2.0,
+        alpha: Optional[float] = 0.25,
+        reduction: str = "mean",
+        normalized: bool = False,
+        reduced_threshold: Optional[float] = None,
+        eps: float = 1e-6,
 ) -> torch.Tensor:
     """Compute binary focal loss between target and output logits.
     See :class:`~pytorch_toolbelt.losses.FocalLoss` for details.
@@ -139,14 +193,14 @@ def focal_loss_with_logits(
 
 class FocalLossSeg(_Loss):
     def __init__(
-        self,
-        mode: str,
-        alpha: Optional[float] = None,
-        gamma: Optional[float] = 2.0,
-        ignore_index: Optional[int] = None,
-        reduction: Optional[str] = "mean",
-        normalized: bool = False,
-        reduced_threshold: Optional[float] = None,
+            self,
+            mode: str,
+            alpha: Optional[float] = None,
+            gamma: Optional[float] = 2.0,
+            ignore_index: Optional[int] = None,
+            reduction: Optional[str] = "mean",
+            normalized: bool = False,
+            reduced_threshold: Optional[float] = None,
     ):
         """Compute Focal loss
 
@@ -216,6 +270,7 @@ class FocalLossSeg(_Loss):
 
         return loss
 
+
 def to_tensor(x, dtype=None) -> torch.Tensor:
     if isinstance(x, torch.Tensor):
         if dtype is not None:
@@ -235,11 +290,11 @@ def to_tensor(x, dtype=None) -> torch.Tensor:
 
 
 def soft_dice_score(
-    output: torch.Tensor,
-    target: torch.Tensor,
-    smooth: float = 0.0,
-    eps: float = 1e-7,
-    dims=None,
+        output: torch.Tensor,
+        target: torch.Tensor,
+        smooth: float = 0.0,
+        eps: float = 1e-7,
+        dims=None,
 ) -> torch.Tensor:
     assert output.size() == target.size()
     if dims is not None:
@@ -254,14 +309,14 @@ def soft_dice_score(
 
 class DiceLoss(_Loss):
     def __init__(
-        self,
-        mode: str,
-        classes: Optional[List[int]] = None,
-        log_loss: bool = False,
-        from_logits: bool = True,
-        smooth: float = 0.0,
-        ignore_index: Optional[int] = None,
-        eps: float = 1e-7,
+            self,
+            mode: str,
+            classes: Optional[List[int]] = None,
+            log_loss: bool = False,
+            from_logits: bool = True,
+            smooth: float = 0.0,
+            ignore_index: Optional[int] = None,
+            eps: float = 1e-7,
     ):
         """Dice loss for image segmentation task.
         It supports binary, multiclass and multilabel cases
@@ -315,11 +370,10 @@ class DiceLoss(_Loss):
         dims = (0, 2)
 
         if self.mode == BINARY_MODE:
-            y_pred=resize(y_pred,(512,512))
-            y_true=resize(y_true,(512,512))
+            y_pred = resize(y_pred, (512, 512))
+            y_true = resize(y_true, (512, 512))
             y_true = y_true.view(bs, 1, -1)
             y_pred = y_pred.view(bs, 1, -1)
-
 
             if self.ignore_index is not None:
                 mask = y_true != self.ignore_index
@@ -333,7 +387,7 @@ class DiceLoss(_Loss):
             if self.ignore_index is not None:
                 mask = y_true != self.ignore_index
                 y_pred = y_pred * mask.unsqueeze(1)
-            
+
                 y_true = F.one_hot((y_true * mask).to(torch.long), num_classes)  # N,H*W -> N,H*W, C
                 y_true = y_true.permute(0, 2, 1) * mask.unsqueeze(1)  # H, C, H*W
             else:
@@ -375,14 +429,15 @@ class DiceLoss(_Loss):
     def compute_score(self, output, target, smooth=0.0, eps=1e-7, dims=None) -> torch.Tensor:
         return soft_dice_score(output, target, smooth, eps, dims)
 
+
 def soft_tversky_score(
-    output: torch.Tensor,
-    target: torch.Tensor,
-    alpha: float,
-    beta: float,
-    smooth: float = 0.0,
-    eps: float = 1e-7,
-    dims=None,
+        output: torch.Tensor,
+        target: torch.Tensor,
+        alpha: float,
+        beta: float,
+        smooth: float = 0.0,
+        eps: float = 1e-7,
+        dims=None,
 ) -> torch.Tensor:
     assert output.size() == target.size()
     if dims is not None:
@@ -397,6 +452,7 @@ def soft_tversky_score(
     tversky_score = (intersection + smooth) / (intersection + alpha * fp + beta * fn + smooth).clamp_min(eps)
 
     return tversky_score
+
 
 class TverskyLoss(DiceLoss):
     """Tversky loss for image segmentation task.
@@ -423,19 +479,18 @@ class TverskyLoss(DiceLoss):
     """
 
     def __init__(
-        self,
-        mode: str,
-        classes: List[int] = None,
-        log_loss: bool = False,
-        from_logits: bool = True,
-        smooth: float = 0.0,
-        ignore_index: Optional[int] = None,
-        eps: float = 1e-7,
-        alpha: float = 0.5,
-        beta: float = 0.5,
-        gamma: float = 1.0
+            self,
+            mode: str,
+            classes: List[int] = None,
+            log_loss: bool = False,
+            from_logits: bool = True,
+            smooth: float = 0.0,
+            ignore_index: Optional[int] = None,
+            eps: float = 1e-7,
+            alpha: float = 0.5,
+            beta: float = 0.5,
+            gamma: float = 1.0
     ):
-
         assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}
         super().__init__(mode, classes, log_loss, from_logits, smooth, ignore_index, eps)
         self.alpha = alpha
@@ -447,3 +502,11 @@ class TverskyLoss(DiceLoss):
 
     def compute_score(self, output, target, smooth=0.0, eps=1e-7, dims=None) -> torch.Tensor:
         return soft_tversky_score(output, target, self.alpha, self.beta, smooth, eps, dims)
+
+
+if __name__ == '__main__':
+    s = torch.randn([4, 2, 64, 64])
+    t = torch.randn([4, 2, 64, 64])
+    loss = MMDLoss()
+    o = loss(s, t)
+    breakpoint()

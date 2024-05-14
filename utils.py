@@ -1,4 +1,3 @@
-
 import torch
 import numpy as np
 from IOUEval import SegmentationMetric
@@ -23,12 +22,13 @@ import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
 
+
 def resize(
-    x: torch.Tensor,
-    size: any or None = None,
-    scale_factor: list[float] or None = None,
-    mode: str = "bicubic",
-    align_corners: bool or None = False,
+        x: torch.Tensor,
+        size: any or None = None,
+        scale_factor: list[float] or None = None,
+        mode: str = "bicubic",
+        align_corners: bool or None = False,
 ) -> torch.Tensor:
     if mode in {"bilinear", "bicubic"}:
         return F.interpolate(
@@ -43,7 +43,10 @@ def resize(
     else:
         raise NotImplementedError(f"resize(mode={mode}) not implemented.")
 
-LOGGING_NAME="custom"
+
+LOGGING_NAME = "custom"
+
+
 def set_logging(name=LOGGING_NAME, verbose=True):
     # sets up logging for the given name
     rank = int(os.getenv('RANK', -1))  # rank in world for Multi-GPU trainings
@@ -58,17 +61,21 @@ def set_logging(name=LOGGING_NAME, verbose=True):
             name: {
                 'class': 'logging.StreamHandler',
                 'formatter': name,
-                'level': level,}},
+                'level': level, }},
         'loggers': {
             name: {
                 'level': level,
                 'handlers': [name],
-                'propagate': False,}}})
+                'propagate': False, }}})
+
+
 set_logging(LOGGING_NAME)  # run before defining LOGGER
 LOGGER = logging.getLogger(LOGGING_NAME)  # define globally (used in train.py, val.py, detect.py, etc.)
 
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
+
     def __init__(self):
         self.reset()
 
@@ -86,7 +93,8 @@ class AverageMeter(object):
 
     def IntersectionOverUnion(self):
         intersection = np.diag(self.confusionMatrix)
-        union = np.sum(self.confusionMatrix, axis=1) + np.sum(self.confusionMatrix, axis=0) - np.diag(self.confusionMatrix)
+        union = np.sum(self.confusionMatrix, axis=1) + np.sum(self.confusionMatrix, axis=0) - np.diag(
+            self.confusionMatrix)
         IoU = intersection / union
         IoU[np.isnan(IoU)] = 0
         return IoU[1]
@@ -96,9 +104,10 @@ class AverageMeter(object):
         # print(imgLabel.shape)
         mask = (imgLabel >= 0) & (imgLabel < self.numClass)
         label = self.numClass * imgLabel[mask] + imgPredict[mask]
-        count = np.bincount(label, minlength=self.numClass**2)
+        count = np.bincount(label, minlength=self.numClass ** 2)
         confusionMatrix = count.reshape(self.numClass, self.numClass)
         return confusionMatrix
+
 
 def poly_lr_scheduler(args, optimizer, epoch, power=2):
     lr = round(args.lr * (1 - epoch / args.max_epochs) ** power, 8)
@@ -108,52 +117,80 @@ def poly_lr_scheduler(args, optimizer, epoch, power=2):
     return lr
 
 
-
-def train(args, train_loader, model, criterion, optimizer, epoch):
+def train(args, source_loader, target_loader, model, disc_model, criterion, criterion_mmd, optimizer, epoch,
+          device='cuda'):
     model.train()
+    disc_model.train()
 
-    total_batches = len(train_loader)
-    pbar = enumerate(train_loader)
-    LOGGER.info(('\n' + '%13s' * 4) % ('Epoch','TverskyLoss','FocalLoss' ,'TotalLoss'))
+    total_batches = len(source_loader)
+    pbar = enumerate(zip(source_loader, target_loader))
+    LOGGER.info(('\n' + '%13s' * 4) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'TotalLoss'))
     pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
-    for i, (_,input, target) in pbar:
+    for i, (source_data, target_data) in pbar:
+        (_, source_input, source_label) = source_data
+        (_, target_input,_) = target_data
         if args.onGPU == True:
-            input = input.cuda().float()   
-        output = model(input)
-        output = (resize(output[0],[512,1024]), resize(output[1],[512,1024]))
-        # target=target.cuda()
+            source_input = source_input.cuda().float()
+            source_label = source_label.cuda()
+            target_input = target_input.cuda().float()
         optimizer.zero_grad()
+        source_output = model(source_input)
+        target_output = model(target_input)
 
-        focal_loss,tversky_loss,loss = criterion(output,target)
+        # Train discriminator
+        # source_features = source_output.detach().view(source_output.size(0), -1)
+        # target_features = target_output.detach().view(target_output.size(0), -1)
 
+        mmd_loss_da = criterion_mmd(source_output[0], target_output[0])
+        mmd_loss_ll = criterion_mmd(source_output[1], target_output[1])
+        mmd_loss = mmd_loss_da + mmd_loss_ll
+        output_source = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
 
-        optimizer.zero_grad()
-        loss.backward()
+        # Source features labeled as 1, target features labeled as 0
+        # discriminator_input = torch.cat([source_features, target_features], dim=0)
+        # discriminator_labels = torch.cat([torch.ones(source_features.size(0)), torch.zeros(target_features.size(0))],dim=0).to(device)
+        # discriminator_output = disc_model(discriminator_input)
+        # disc_loss = criterion_discriminator(discriminator_output.squeeze(), discriminator_labels)
+        # disc_loss = F.binary_cross_entropy(discriminator_output.squeeze(), discriminator_labels)
+        # disc_loss.backward()
+        # disc_optimizer.step()
+        # disc_optimizer.zero_grad()
+
+        # Train segmentation model to fool the discriminator
+        # target_features = target_output.view(target_output.size(0), -1)
+        # discriminator_output = disc_model(target_features)
+        # adversarial_loss = F.binary_cross_entropy(discriminator_output.squeeze(),torch.ones(target_features.size(0)).to(device))
+        # adversarial_loss = criterion_adversarial(discriminator_output.squeeze(),torch.ones(target_features.size(0)).to(device))
+        focal_loss, tversky_loss, loss = criterion(output_source, source_label)
+
+        total_loss = loss + mmd_loss
+        total_loss.backward()
         optimizer.step()
-        pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
-                                     (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss.item()))
-        
 
-def train16fp(args, train_loader, model, criterion, optimizer, epoch,scaler):
+        pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
+                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss.item()))
+
+
+def train16fp(args, train_loader, model, criterion, optimizer, epoch, scaler):
     model.train()
     print("16fp-------------------")
     total_batches = len(train_loader)
     pbar = enumerate(train_loader)
-    LOGGER.info(('\n' + '%13s' * 4) % ('Epoch','TverskyLoss','FocalLoss' ,'TotalLoss'))
+    LOGGER.info(('\n' + '%13s' * 4) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'TotalLoss'))
     pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
-    for i, (_,input, target) in pbar:
+    for i, (_, input, target) in pbar:
         optimizer.zero_grad()
         if args.onGPU == True:
-            input = input.cuda().float()      
+            input = input.cuda().float()
         output = model(input)
         with torch.cuda.amp.autocast():
-            focal_loss,tversky_loss,loss = criterion(output,target)
+            focal_loss, tversky_loss, loss = criterion(output, target)
 
         scaler.scale(loss).backward()
         scaler.step(optimizer)
         scaler.update()
         pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
-                                     (f'{epoch}/{300 - 1}', tversky_loss, focal_loss, loss.item()))
+                             (f'{epoch}/{300 - 1}', tversky_loss, focal_loss, loss.item()))
 
 
 @torch.no_grad()
@@ -185,8 +222,7 @@ def val(val_loader, model):
 
         with torch.no_grad():
             output = model(input_var)
-            output = (resize(output[0], [512,1024]), resize(output[1], [512,1024]))
-
+            output = (resize(output[0], [512, 1024]), resize(output[1], [512, 1024]))
 
         out_da, out_ll = output
         target_da, target_ll = target
@@ -224,7 +260,7 @@ def val(val_loader, model):
     return da_segment_result, ll_segment_result
 
 
-def valid(mymodel, Dataset):
+def valid(mymodel, valLoader):
     '''
     Main function for trainign and validation
     :param args: global arguments
@@ -239,9 +275,9 @@ def valid(mymodel, Dataset):
         model = model.cuda()
         cudnn.benchmark = True
 
-    valLoader = torch.utils.data.DataLoader(
-        Dataset,
-        batch_size=2, shuffle=False, num_workers=1, pin_memory=True)
+    # valLoader = torch.utils.data.DataLoader(
+    #     Dataset,
+    #     batch_size=2, shuffle=False, num_workers=1, pin_memory=True)
 
     total_paramters = netParams(model)
     print('Total network parameters: ' + str(total_paramters))
@@ -262,8 +298,10 @@ def valid(mymodel, Dataset):
         ll_seg_acc=ll_segment_results[0], ll_seg_iou=ll_segment_results[1], ll_seg_miou=ll_segment_results[2])
     print(msg2)
 
+
 def save_checkpoint(state, filenameCheckpoint='checkpoint.pth.tar'):
     torch.save(state, filenameCheckpoint)
+
 
 def netParams(model):
     return np.sum([np.prod(parameter.size()) for parameter in model.parameters()])

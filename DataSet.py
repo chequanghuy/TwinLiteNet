@@ -125,409 +125,11 @@ def random_perspective2(combination,  degrees=10, translate=.1, scale=.1, shear=
     return combination
 
 
-def mergList(list1, list2):
-  list3=list1+list2
-  count=0
-  i1=0
-  i2=0
-  max_idx=len(list3)
-  print(max_idx)
-  for idx in range(len(list3)):
-      if count < 1:
-        list3[idx]=list2[i2]
-        count+=1
-        i2+=1
-      else:
-        list3[idx]=list1[i1]
-        i1+=1
-        count=0
-  return list3
-
 class MyDataset(torch.utils.data.Dataset):
     '''
     Class to load the dataset
     '''
-    def __init__(self, transform=None,valid=False):
-        '''
-        :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
-        :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
-        :param transform: Type of transformation. SEe Transforms.py for supported transformations
-        '''
-
-        self.transform = transform
-        self.Tensor = transforms.ToTensor()
-        self.valid=valid
-        if valid:
-            self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/val'
-            self.names=os.listdir(self.root)
-        else:
-            self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
-            self.names=os.listdir(self.root)#[:1000]
-
-    def __len__(self):
-        return len(self.names)
-
-    def __getitem__(self, idx):
-        '''
-
-        :param idx: Index of the image file
-        :return: returns the image and corresponding label file.
-        '''
-        W_=1024
-        H_=512
-        image_name=os.path.join(self.root,self.names[idx])
-
-        image = cv2.imread(image_name)
-        label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
-        label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
-        if not self.valid:
-            if random.random()<0.5:
-                combination = (image, label1, label2)
-                (image, label1, label2)= random_perspective(
-                    combination=combination,
-                    degrees=10,
-                    translate=0.1,
-                    scale=0.25,
-                    shear=0.0
-                )
-            if random.random()<0.5:
-                augment_hsv(image)
-            if random.random() < 0.5:
-                image = np.fliplr(image)
-                label1 = np.fliplr(label1)
-                label2 = np.fliplr(label2)
-
-        label1 = cv2.resize(label1, (W_, H_))
-        label2 = cv2.resize(label2, (W_, H_))
-        image = cv2.resize(image, (W_, H_))
-
-        _,seg_b1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY_INV)
-        _,seg_b2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY_INV)
-        _,seg1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY)
-        _,seg2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY)
-
-        seg1 = self.Tensor(seg1)
-        seg2 = self.Tensor(seg2)
-        seg_b1 = self.Tensor(seg_b1)
-        seg_b2 = self.Tensor(seg_b2)
-        seg_da = torch.stack((seg_b1[0], seg1[0]),0)
-        seg_ll = torch.stack((seg_b2[0], seg2[0]),0)
-        # image = image[:, :, ::-1].transpose(2, 0, 1)
-        image = np.ascontiguousarray(image)
-
-        if self.transform is not None :
-            image = self.transform(image)
-
-        return image_name,image,(seg_da,seg_ll)
-
-
-class My_test_Dataset(torch.utils.data.Dataset):
-    '''
-    Class to load the dataset
-    '''
-    def __init__(self, transform=None,valid=False):
-        '''
-        :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
-        :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
-        :param transform: Type of transformation. SEe Transforms.py for supported transformations
-        '''
-
-        self.transform = transform
-        self.Tensor = transforms.ToTensor()
-        self.valid=valid
-        if valid:
-            self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/val'
-            self.names=os.listdir(self.root)
-        else:
-            self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
-            self.names=os.listdir(self.root)#[:1000]
-
-    def __len__(self):
-        return len(self.names)
-
-    def __getitem__(self, idx):
-        '''
-
-        :param idx: Index of the image file
-        :return: returns the image and corresponding label file.
-        '''
-        W_=512
-        H_=512
-        image_name=os.path.join(self.root,self.names[idx])
-
-        image = cv2.imread(image_name)
-        label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
-        label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
-        if not self.valid:
-            if random.random()<0.5:
-                combination = (image, label1, label2)
-                # (image, label1, label2)= random_perspective(
-                #     combination=combination,
-                #     degrees=10,
-                #     translate=0.1,
-                #     scale=0.25,
-                #     shear=0.0
-                # )
-            if random.random()<0.5:
-                augment_hsv(image)
-            if random.random() < 0.5:
-                image = np.fliplr(image)
-                label1 = np.fliplr(label1)
-                label2 = np.fliplr(label2)
-
-        label1 = cv2.resize(label1, (W_, H_))
-        label2 = cv2.resize(label2, (W_, H_))
-        image = cv2.resize(image, (W_, H_))
-
-        _,seg_b1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY_INV)
-        _,seg_b2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY_INV)
-        _,seg1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY)
-        _,seg2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY)
-
-        seg1 = self.Tensor(seg1)
-        seg2 = self.Tensor(seg2)
-        seg_b1 = self.Tensor(seg_b1)
-        seg_b2 = self.Tensor(seg_b2)
-        seg_da = torch.stack((seg_b1[0], seg1[0]),0)
-        seg_ll = torch.stack((seg_b2[0], seg2[0]),0)
-        # image = image[:, :, ::-1].transpose(2, 0, 1)
-        image = np.ascontiguousarray(image)
-
-        if self.transform is not None :
-            image = self.transform(image)
-
-        return image_name,image,(seg_da,seg_ll)
-
-class IADDataset(torch.utils.data.Dataset):
-    '''
-    Class to load the dataset
-    '''
-    def __init__(self, transform=None,valid=False):
-        '''
-        :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
-        :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
-        :param transform: Type of transformation. SEe Transforms.py for supported transformations
-        '''
-
-        self.transform = transform
-        self.Tensor = transforms.ToTensor()
-        self.valid=valid
-        if valid:
-            self.root='/kaggle/working/IADD/IADDv6/val/img'
-            self.names=os.listdir(self.root)
-        else:
-            self.root='/kaggle/working/iadd/img/content/train_p1_unlabeled'
-            self.names=os.listdir(self.root)
-
-    def __len__(self):
-        return len(self.names)
-
-    def __getitem__(self, idx):
-        '''
-
-        :param idx: Index of the image file
-        :return: returns the image and corresponding label file.
-        '''
-        W_=512
-        H_=512
-        image_name=os.path.join(self.root,self.names[idx])
-
-        image = cv2.imread(image_name)
-        if self.valid:
-            label1 = cv2.imread(image_name.replace("img","drivable").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)
-        else:
-            label1 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","da").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","ll").replace(".jpg",".png"), 0)
-        if not self.valid:
-            if random.random()<0.5:
-                combination = (image, label1, label2)
-                (image, label1, label2)= random_perspective(
-                    combination=combination,
-                    degrees=10,
-                    translate=0.1,
-                    scale=0.25,
-                    shear=0.0
-                )
-            if random.random()<0.5:
-                augment_hsv(image)
-            if random.random() < 0.5:
-                image = np.fliplr(image)
-                label1 = np.fliplr(label1)
-                label2 = np.fliplr(label2)
-
-        label1 = cv2.resize(label1, (W_, H_))
-        label2 = cv2.resize(label2, (W_, H_))
-        image = cv2.resize(image, (W_, H_))
-
-        _,seg_b1 = cv2.threshold(label1,0,255,cv2.THRESH_BINARY_INV)
-        _,seg_b2 = cv2.threshold(label2,0,255,cv2.THRESH_BINARY_INV)
-        _,seg1 = cv2.threshold(label1,0,255,cv2.THRESH_BINARY)
-        _,seg2 = cv2.threshold(label2,0,255,cv2.THRESH_BINARY)
-
-        seg1 = self.Tensor(seg1)
-        seg2 = self.Tensor(seg2)
-        seg_b1 = self.Tensor(seg_b1)
-        seg_b2 = self.Tensor(seg_b2)
-        seg_da = torch.stack((seg_b1[0], seg1[0]),0)
-        seg_ll = torch.stack((seg_b2[0], seg2[0]),0)
-        # image = image[:, :, ::-1].transpose(2, 0, 1)
-        image = np.ascontiguousarray(image)
-
-        if self.transform is not None :
-            image = self.transform(image)
-
-        return image_name,image,(seg_da,seg_ll)
-
-
-class MIXEDataset(torch.utils.data.Dataset):
-    '''
-    Class to load the dataset
-    '''
-    def __init__(self, transform=None,valid=False):
-        '''
-        :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
-        :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
-        :param transform: Type of transformation. SEe Transforms.py for supported transformations
-        '''
-
-        self.transform = transform
-        self.Tensor = transforms.ToTensor()
-        self.valid=valid
-        if valid:
-            self.root1='/kaggle/working/IADD/IADDv6/val/img'
-            self.root2=''
-            self.names=os.listdir(self.root1)
-        else:
-            self.root1='/kaggle/working/iadd/img/content/train_p1_unlabeled'
-            self.root2='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
-            self.names1=os.listdir(self.root1)#[:100]
-            self.names2=os.listdir(self.root2)[:21312]#[:63934]
-            self.names= mergList(self.names1, self.names2)
-
-        print(len(self.names))
-
-    def __len__(self):
-        return len(self.names)
-
-    def __getitem__(self, idx):
-        '''
-
-        :param idx: Index of the image file
-        :return: returns the image and corresponding label file.
-        '''
-        W_=512
-        H_=512
-        if self.valid:
-            image_name=os.path.join(self.root1,self.names[idx])
-            image = cv2.imread(image_name)
-            label1 = cv2.imread(image_name.replace("img","drivable").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("img","lane").replace(".jpg",".png"), 0)
-        else:
-            if idx%2==1:
-                image_name=os.path.join(self.root1,self.names[idx])
-                image = cv2.imread(image_name)
-                label1 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","da").replace(".jpg",".png"), 0)
-                label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled","ll").replace(".jpg",".png"), 0)
-            else:
-                image_name=os.path.join(self.root2,self.names[idx])
-                image = cv2.imread(image_name)
-                label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
-                label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
-
-
-        if not self.valid:
-            if random.random()<0.5:
-                combination = (image, label1, label2)
-                (image, label1, label2)= random_perspective(
-                    combination=combination,
-                    degrees=10,
-                    translate=0.1,
-                    scale=0.25,
-                    shear=0.0
-                )
-            if random.random()<0.5:
-                augment_hsv(image)
-            if random.random() < 0.5:
-                image = np.fliplr(image)
-                label1 = np.fliplr(label1)
-                label2 = np.fliplr(label2)
-
-        label1 = cv2.resize(label1, (W_, H_))
-        label2 = cv2.resize(label2, (W_, H_))
-        image = cv2.resize(image, (W_, H_))
-
-        _,seg_b1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY_INV)
-        _,seg_b2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY_INV)
-        _,seg1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY)
-        _,seg2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY)
-
-        seg1 = self.Tensor(seg1)
-        seg2 = self.Tensor(seg2)
-        seg_b1 = self.Tensor(seg_b1)
-        seg_b2 = self.Tensor(seg_b2)
-        seg_da = torch.stack((seg_b1[0], seg1[0]),0)
-        seg_ll = torch.stack((seg_b2[0], seg2[0]),0)
-        # image = image[:, :, ::-1].transpose(2, 0, 1)
-        image = np.ascontiguousarray(image)
-
-        if self.transform is not None :
-            image = self.transform(image)
-
-        return image_name,image,(seg_da,seg_ll)
-
-
-
-class first_pseudo_label_dataset(torch.utils.data.Dataset):
-    '''
-    Class to load the dataset
-    '''
-    def __init__(self, transform=None,valid=False):
-        '''
-        :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
-        :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
-        :param transform: Type of transformation. SEe Transforms.py for supported transformations
-        '''
-
-        self.transform = transform
-        self.Tensor = transforms.ToTensor()
-        self.valid=valid
-        if valid:
-            self.root=None
-        else:
-            self.root='/kaggle/working/iadd/img/content/train_p1_unlabeled'
-            self.names=os.listdir(self.root)
-
-    def __len__(self):
-        return len(self.names)
-
-    def __getitem__(self, idx):
-        '''
-
-        :param idx: Index of the image file
-        :return: returns the image and corresponding label file.
-        '''
-        W_=512
-        H_=512
-        image_name=os.path.join(self.root,self.names[idx])
-
-        image = cv2.imread(image_name)
-        shape = image.shape
-        image = cv2.resize(image, (W_, H_))
-
-        # image = image[:, :, ::-1].transpose(2, 0, 1)
-        image = np.ascontiguousarray(image)
-
-        if self.transform is not None :
-            image = self.transform(image)
-
-        return image_name,image,shape
-class first_pseudo_label_dataset2(torch.utils.data.Dataset):
-    '''
-    Class to load the dataset
-    '''
-
-    def __init__(self, transform=None, valid=False):
+    def __init__(self, transform=None,valid=False,engin='kaggle',data='bdd'):
         '''
         :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
         :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
@@ -537,57 +139,40 @@ class first_pseudo_label_dataset2(torch.utils.data.Dataset):
         self.transform = transform
         self.Tensor = transforms.ToTensor()
         self.valid = valid
-        if valid:
-            self.root = None
-        else:
-            self.root = '/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
-            self.names = os.listdir(self.root)[:10000]
+        self.engin = engin
+        self.data = data
 
-    def __len__(self):
-        return len(self.names)
+        if self.data == 'bdd':
+            if self.engin == 'kaggle': #bdd dataset on kaggle engine
+                if valid:
+                    self.root = '/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/val'
+                    self.names = os.listdir(self.root)
+                else:
+                    self.root = '/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
+                    self.names = os.listdir(self.root)  # [:1000]
+            else:                       #bdd dataset on colab engine
+                if valid:
+                    self.root = '/content/data/bdd100k/bdd100k/images/100k/val'
+                    self.names = os.listdir(self.root)
+                else:
+                    self.root = '/content/data/bdd100k/bdd100k/images/100k/train'
+                    self.names = os.listdir(self.root)[:1000]
+        elif self.data == 'IADD':
+            if self.engin == 'kaggle':  #IADD dataset on kaggle engine
+                if valid:
+                    self.root = '/kaggle/working/IADD/IADDv6/val/img'
+                    self.names = os.listdir(self.root)
+                else:
+                    self.root = '/kaggle/working/iadd/img/content/train_p1_unlabeled'
+                    self.names = os.listdir(self.root)
+            else:                        #IADD dataset on colab engine
+                if valid:
+                    self.root = '/content/IADD/IADDv6/val/img'
+                    self.names = os.listdir(self.root)
+                else:
+                    self.root = '/content/iadd/img/content/train_p1_unlabeled'
+                    self.names = os.listdir(self.root)
 
-    def __getitem__(self, idx):
-        '''
-
-        :param idx: Index of the image file
-        :return: returns the image and corresponding label file.
-        '''
-        W_ = 512
-        H_ = 512
-        image_name = os.path.join(self.root, self.names[idx])
-
-        image = cv2.imread(image_name)
-        shape = image.shape
-        image = cv2.resize(image, (W_, H_))
-
-        # image = image[:, :, ::-1].transpose(2, 0, 1)
-        image = np.ascontiguousarray(image)
-
-        if self.transform is not None:
-            image = self.transform(image)
-
-        return image_name, image, shape
-
-class BDDataset(torch.utils.data.Dataset):
-    '''
-    Class to load the dataset
-    '''
-    def __init__(self, transform=None,valid=False):
-        '''
-        :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
-        :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
-        :param transform: Type of transformation. SEe Transforms.py for supported transformations
-        '''
-
-        self.transform = transform
-        self.Tensor = transforms.ToTensor()
-        self.valid=valid
-        if valid:
-            self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/val'
-            self.names=os.listdir(self.root)
-        else:
-            self.root='/kaggle/input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train'
-            self.names=os.listdir(self.root)[:10000]
 
     def __len__(self):
         return len(self.names)
@@ -603,12 +188,21 @@ class BDDataset(torch.utils.data.Dataset):
         image_name=os.path.join(self.root,self.names[idx])
 
         image = cv2.imread(image_name)
-        if self.valid:
-            label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
-            label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
-        else:
-            label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train","working/iadd/da").replace(".jpg",".png"), 0)
-            label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k/train","working/iadd/ll").replace(".jpg",".png"), 0)
+        if self.data == 'bdd':
+            if self.engin == 'kaggle':
+                label1 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_seg_gt").replace("jpg","png"), 0)
+                label2 = cv2.imread(image_name.replace("input/bdd100k-dataset/bdd100k/bdd100k/images/100k","working/labels/bdd_lane_gt").replace("jpg","png"), 0)
+            else:
+                label1 = cv2.imread(image_name.replace("bdd100k/bdd100k/images/100k", "labels/bdd_seg_gt").replace("jpg", "png"), 0)
+                label2 = cv2.imread(image_name.replace("bdd100k/bdd100k/images/100k", "labels/bdd_lane_gt").replace("jpg", "png"), 0)
+        elif self.data == 'IADD':
+            if self.valid:
+                label1 = cv2.imread(image_name.replace("img", "drivable").replace(".jpg", ".png"), 0)
+                label2 = cv2.imread(image_name.replace("img", "lane").replace(".jpg", ".png"), 0)
+            else:
+                label1 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled", "da").replace(".jpg", ".png"), 0)
+                label2 = cv2.imread(image_name.replace("img/content/train_p1_unlabeled", "ll").replace(".jpg", ".png"), 0)
+
         if not self.valid:
             if random.random()<0.5:
                 combination = (image, label1, label2)
@@ -630,10 +224,10 @@ class BDDataset(torch.utils.data.Dataset):
         label2 = cv2.resize(label2, (W_, H_))
         image = cv2.resize(image, (W_, H_))
 
-        _,seg_b1 = cv2.threshold(label1,0,255,cv2.THRESH_BINARY_INV)
-        _,seg_b2 = cv2.threshold(label2,0,255,cv2.THRESH_BINARY_INV)
-        _,seg1 = cv2.threshold(label1,0,255,cv2.THRESH_BINARY)
-        _,seg2 = cv2.threshold(label2,0,255,cv2.THRESH_BINARY)
+        _,seg_b1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY_INV)
+        _,seg_b2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY_INV)
+        _,seg1 = cv2.threshold(label1,1,255,cv2.THRESH_BINARY)
+        _,seg2 = cv2.threshold(label2,1,255,cv2.THRESH_BINARY)
 
         seg1 = self.Tensor(seg1)
         seg2 = self.Tensor(seg2)
@@ -649,3 +243,49 @@ class BDDataset(torch.utils.data.Dataset):
 
         return image_name,image,(seg_da,seg_ll)
 
+
+class UlabeledDataset(torch.utils.data.Dataset):
+    '''
+    Class to load the dataset
+    '''
+    def __init__(self, transform=None, engin='kaggle', data='IADD'):
+        '''
+        :param imList: image list (Note that these lists have been processed and pickled using the loadData.py)
+        :param labelList: label list (Note that these lists have been processed and pickled using the loadData.py)
+        :param transform: Type of transformation. SEe Transforms.py for supported transformations
+        '''
+
+        self.transform = transform
+        self.Tensor = transforms.ToTensor()
+        self.data=data
+        self.engin=engin
+        if self.engin == 'kaggle':
+            self.root='/kaggle/working/iadd/img/content/train_p1_unlabeled'
+            self.names=os.listdir(self.root)
+        else:
+            self.root='/content/iadd/img/content/train_p1_unlabeled'
+            self.names=os.listdir(self.root)
+
+    def __len__(self):
+        return len(self.names)
+
+    def __getitem__(self, idx):
+        '''
+        :param idx: Index of the image file
+        :return: returns the image and corresponding label file.
+        '''
+        W_ = 512
+        H_ = 512
+        image_name = os.path.join(self.root,self.names[idx])
+
+        image = cv2.imread(image_name)
+        shape = image.shape
+        image = cv2.resize(image, (W_, H_))
+
+        # image = image[:, :, ::-1].transpose(2, 0, 1)
+        image = np.ascontiguousarray(image)
+
+        if self.transform is not None :
+            image = self.transform(image)
+
+        return image_name, image, shape
