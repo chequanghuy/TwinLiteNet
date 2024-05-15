@@ -127,6 +127,8 @@ def poly_lr_scheduler(args, optimizer, epoch, power=2):
 
 def train(args, source_loader, target_loader, model, criterion, criterion_mmd, optimizer, epoch):
     model.train()
+    for param in model.backbone.parameters():
+        param.required_grad = False
     # disc_model.train()
 
     total_batches = len(source_loader)
