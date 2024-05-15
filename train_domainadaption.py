@@ -99,9 +99,6 @@ def train_net(args):
 
     for epoch in range(start_epoch, args.max_epochs):
 
-        valid(model, iadd_valLoader)
-        valid(model, bdd_valLoader)
-
         model_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
         poly_lr_scheduler(args, optimizer, epoch)
         # poly_lr_scheduler(args, disc_optimizer, epoch)
@@ -122,7 +119,8 @@ def train_net(args):
             'lr': lr
         }, args.savedir + 'checkpoint.pth.tar')
 
-
+        valid(model, iadd_valLoader)
+        valid(model, bdd_valLoader)
 
 if __name__ == '__main__':
     parser = ArgumentParser()
