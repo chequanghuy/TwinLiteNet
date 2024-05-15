@@ -96,10 +96,11 @@ def train_net(args):
     target_loader = torch.utils.data.DataLoader(
         myDataLoader.UlabeledDataset(transform=transform, engin=engine,data='IADD'),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
-    # valid(model, bdd_valLoader)
-    # valid(model, iadd_valLoader)
 
     for epoch in range(start_epoch, args.max_epochs):
+
+        valid(model, iadd_valLoader)
+        valid(model, bdd_valLoader)
 
         model_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
         poly_lr_scheduler(args, optimizer, epoch)
@@ -121,15 +122,6 @@ def train_net(args):
             'lr': lr
         }, args.savedir + 'checkpoint.pth.tar')
 
-        # Dataset0= MIXEDataset(transform=transform , valid=True)
-        # pseudo_data = torch.utils.data.DataLoader(
-        #     first_pseudo_label_dataset2(transform=transform, valid=False),
-        #     batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-
-        valid(model, iadd_valLoader)
-        valid(model, bdd_valLoader)
-
-        # pseudo_label_maker(pseudo_data, model)
 
 
 if __name__ == '__main__':
