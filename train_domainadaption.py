@@ -12,7 +12,7 @@ from utils import train, valid, netParams, save_checkpoint, poly_lr_scheduler, p
 import torch.optim.lr_scheduler
 from torchvision.transforms import transforms as T
 import DataSet as myDataLoader
-from loss import TotalLoss, DiscriminatorLoss,MMDLoss
+from loss import TotalLoss, DiscriminatorLoss,MMDLoss, MMDTotal
 import os
 import torch.backends.cudnn as cudnn
 from model.Discriminator import Discriminator
@@ -62,8 +62,8 @@ def train_net(args):
         model = model.cuda()
         cudnn.benchmark = True
 
-    criteria = TotalLoss()
-    criterion_mmd = MMDLoss()
+    criteria = TotalLoss(device=args.device)
+    criterion_mmd = MMDTotal(device=args.deveice)
     start_epoch = 0
     lr = args.lr
 
@@ -136,6 +136,7 @@ def train_net(args):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
+    parser.add_argument('--device', type=str, default='cuda:0')
     parser.add_argument('--max_epochs', type=int, default=10, help='Max. number of epochs')
     parser.add_argument('--num_workers', type=int, default=12, help='No. of parallel threads')
     parser.add_argument('--batch_size', type=int, default=16, help='Batch size. 12 for ESPNet-C and 6 for ESPNet. '

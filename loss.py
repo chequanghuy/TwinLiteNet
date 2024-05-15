@@ -30,6 +30,22 @@ class DiscriminatorLoss(nn.Module):
         return total_discriminator
 
 
+class MMDTotal(nn.Module):
+    def __init__(self, device="cuda:0"):
+        super().__init__()
+        self.mmd_loss = MMDLoss().to(device)
+
+    def forward(self, source_output, target_output):
+        source_da_output, source_ll_output = source_output
+        target_da_output, target_ll_ourput = target_output
+
+        mmd_loss_da = self.mmd_loss(source_da_output, target_da_output)
+        mmd_loss_ll = self.mmd_loss(source_ll_output, target_ll_ourput)
+
+        mmd_total = mmd_loss_da + mmd_loss_ll
+        return mmd_total
+
+
 class MMDLoss(nn.Module):
 
     def __init__(self, kernel_type='rbf', kernel_mul=2.0, kernel_num=5):
@@ -78,7 +94,7 @@ class TotalLoss(nn.Module):
     This file defines a cross entropy loss for 2D images
     '''
 
-    def __init__(self):
+    def __init__(self, device="cuda:0"):
         '''
         :param weight: 1D weight vector to deal with the class-imbalance
         '''
@@ -88,9 +104,11 @@ class TotalLoss(nn.Module):
         self.ce_loss_history = []
         self.tvk_loss_history = []
 
-        self.seg_tver_da = TverskyLoss(mode="multiclass", alpha=0.7, beta=0.3, gamma=4.0 / 3, from_logits=True)
-        self.seg_tver_ll = TverskyLoss(mode="multiclass", alpha=0.9, beta=0.1, gamma=4.0 / 3, from_logits=True)
-        self.seg_focal = FocalLossSeg(mode="multiclass", alpha=0.25)
+        self.seg_tver_da = TverskyLoss(mode="multiclass", alpha=0.7, beta=0.3, gamma=4.0 / 3, from_logits=True).to(
+            device)
+        self.seg_tver_ll = TverskyLoss(mode="multiclass", alpha=0.9, beta=0.1, gamma=4.0 / 3, from_logits=True).to(
+            device)
+        self.seg_focal = FocalLossSeg(mode="multiclass", alpha=0.25).to(device)
         # self.seg_criterion3 = FocalLossSeg(mode="multiclass", alpha=1)
 
     def forward(self, outputs, targets):
@@ -98,10 +116,10 @@ class TotalLoss(nn.Module):
         out_da, out_ll = outputs
 
         _, seg_da = torch.max(seg_da, 1)
-        seg_da = seg_da.cuda()
+        seg_da = seg_da
 
         _, seg_ll = torch.max(seg_ll, 1)
-        seg_ll = seg_ll.cuda()
+        seg_ll = seg_ll
 
         tversky_loss = self.seg_tver_da(out_da, seg_da) + self.seg_tver_ll(out_ll, seg_ll)
         focal_loss = self.seg_focal(out_ll, seg_ll) + self.seg_focal(out_da, seg_da)

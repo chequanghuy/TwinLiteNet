@@ -124,25 +124,22 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
 
     total_batches = len(source_loader)
     pbar = enumerate(zip(source_loader, cycle(target_loader)))
-    LOGGER.info(('\n' + '%13s' * 4) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'TotalLoss'))
+    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss','MMDLoss', 'TotalLoss'))
     pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
     for i, (source_data, target_data) in pbar:
         (_, source_input, source_label) = source_data
         (_, target_input,_) = target_data
-        # if args.onGPU == True:
-            # source_input = source_input.cuda().float()
-            # source_label = source_label.cuda()
-            # target_input = target_input.cuda().float()
+        if args.device == 'cuda:0':
+            source_input = source_input.cuda().float()
+            source_label[0] = source_label[0].cuda()
+            source_label[1] = source_label[1].cuda()
+            target_input = target_input.cuda().float()
         optimizer.zero_grad()
-        source_output = model(source_input.cuda().float())
-        target_output = model(target_input.cuda().float())
-        # Train discriminator
-        # source_features = source_output.detach().view(source_output.size(0), -1)
-        # target_features = target_output.detach().view(target_output.size(0), -1)
+        source_output = model(source_input)
+        target_output = model(target_input)
 
-        mmd_loss_da = criterion_mmd(source_output[0], target_output[0])
-        mmd_loss_ll = criterion_mmd(source_output[1], target_output[1])
-        mmd_loss = mmd_loss_da + mmd_loss_ll
+        mmd_loss = criterion_mmd(source_output, target_output)
+
         output_source = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
 
         # Source features labeled as 1, target features labeled as 0
@@ -166,8 +163,8 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
         total_loss.backward()
         optimizer.step()
 
-        pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
-                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss.item()))
+        pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
+                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, mmd_loss, total_loss.item()))
 
 
 def train16fp(args, train_loader, model, criterion, optimizer, epoch, scaler):
