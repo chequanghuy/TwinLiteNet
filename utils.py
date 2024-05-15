@@ -130,8 +130,8 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = tqdm(range(total_batches), bar_format='{l_bar}{bar:10}{r_bar}')
     for i in pbar:
-        (_, source_input, source_label) = next(source_loader)
-        (_, target_input, _) = next(target_loader)
+        (_, source_input, source_label) = source_loader.__new__()
+        (_, target_input, _) = target_loader.__new__()
         if args.device == 'cuda:0':
             source_input = source_input.cuda().float()
             source_label[0] = source_label[0].cuda()

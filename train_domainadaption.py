@@ -87,10 +87,8 @@ def train_net(args):
 
     # iadd_valLoader = torch.utils.data.DataLoader(
     iadd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='IADD')
-        # batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     # bdd_valLoader = torch.utils.data.DataLoader(
     bdd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='bdd')
-        # batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     source_loader = torch.utils.data.DataLoader(
         myDataLoader.MyDataset(transform=transform, valid=False, engin=engine, data='bdd'),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
@@ -110,7 +108,7 @@ def train_net(args):
             lr = param_group['lr']
         print("Learning rate: " + str(lr))
         # train for one epoch
-        model = model.cuda()
+        model = model.to(args.device)
         # disc_model = disc_model.cuda()
         train(args, source_loader, target_loader, model, criteria, criterion_mmd, optimizer, epoch)
 
