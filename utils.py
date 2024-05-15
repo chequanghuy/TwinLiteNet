@@ -139,7 +139,7 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
             target_input = target_input.cuda().float()
         optimizer.zero_grad()
         source_output = model(source_input)
-        # target_output = model(target_input)
+        target_output = model(target_input)
 
         mmd_loss = 0
 
