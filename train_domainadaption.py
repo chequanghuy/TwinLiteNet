@@ -111,8 +111,8 @@ def train_net(args):
         # disc_model = disc_model.cuda()
         train(args, source_loader, target_loader, model, criteria, criterion_mmd, optimizer, epoch)
 
-        valid(model, iadd_valLoader)
-        valid(model, bdd_valLoader)
+        # valid(model, iadd_valLoader)
+        # valid(model, bdd_valLoader)
 
         torch.save(model.state_dict(), model_file_name)
 
@@ -123,6 +123,8 @@ def train_net(args):
             'lr': lr
         }, checkpoint_file_name)
 
+        valid(model, iadd_valLoader)
+        valid(model, bdd_valLoader)
 
 
 
