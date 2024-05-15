@@ -23,6 +23,7 @@ from tqdm import tqdm
 import torch.nn.functional as F
 from itertools import cycle
 
+
 def resize(
         x: torch.Tensor,
         size: any or None = None,
@@ -118,17 +119,18 @@ def poly_lr_scheduler(args, optimizer, epoch, power=2):
 
 
 def train(args, source_loader, target_loader, model, criterion, criterion_mmd, optimizer, epoch):
-
     model.train()
     # disc_model.train()
 
     total_batches = len(source_loader)
-    pbar = enumerate(zip(source_loader, cycle(target_loader)))
-    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss','MMDLoss', 'TotalLoss'))
-    pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
-    for i, (source_data, target_data) in pbar:
-        (_, source_input, source_label) = source_data
-        (_, target_input,_) = target_data
+    target_loader = cycle(target_loader)
+    # pbar = enumerate(zip(source_loader, cycle(target_loader)))
+    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'MMDLoss', 'TotalLoss'))
+    # pbar = tqdm(pbar, total=total_batches, )
+    pbar = tqdm(total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
+    for i in pbar:
+        (_, source_input, source_label) = next(source_loader)
+        (_, target_input, _) = next(target_loader)
         if args.device == 'cuda:0':
             source_input = source_input.cuda().float()
             source_label[0] = source_label[0].cuda()
