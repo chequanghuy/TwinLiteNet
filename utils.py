@@ -123,7 +123,8 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
     # disc_model.train()
 
     total_batches = len(source_loader)
-    target_loader = cycle(target_loader)
+    target_loader = cycle(iter(target_loader))
+    source_loader = iter(source_loader)
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
     LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'MMDLoss', 'TotalLoss'))
     # pbar = tqdm(pbar, total=total_batches, )
