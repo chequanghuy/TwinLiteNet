@@ -100,6 +100,7 @@ def train_net(args):
     for epoch in range(start_epoch, args.max_epochs):
 
         model_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
+        checkpoint_file_name = args.savedir + os.sep + 'checkpoint_{}.pth.tar'.format(epoch)
         poly_lr_scheduler(args, optimizer, epoch)
         # poly_lr_scheduler(args, disc_optimizer, epoch)
         for param_group in optimizer.param_groups:
@@ -110,6 +111,9 @@ def train_net(args):
         # disc_model = disc_model.cuda()
         train(args, source_loader, target_loader, model, criteria, criterion_mmd, optimizer, epoch)
 
+        valid(model, iadd_valLoader)
+        valid(model, bdd_valLoader)
+
         torch.save(model.state_dict(), model_file_name)
 
         save_checkpoint({
@@ -117,10 +121,10 @@ def train_net(args):
             'state_dict': model.state_dict(),
             'optimizer': optimizer.state_dict(),
             'lr': lr
-        }, args.savedir + 'checkpoint.pth.tar')
+        }, checkpoint_file_name)
 
-        valid(model, iadd_valLoader)
-        valid(model, bdd_valLoader)
+
+
 
 if __name__ == '__main__':
     parser = ArgumentParser()

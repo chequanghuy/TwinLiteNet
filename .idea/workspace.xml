@@ -155,14 +155,6 @@
       <option name="presentableId" value="Default" />
       <updated>1714381415492</updated>
     </task>
-    <task id="LOCAL-00032" summary="chert_update">
-      <option name="closed" value="true" />
-      <created>1715070225437</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1715070225437</updated>
-    </task>
     <task id="LOCAL-00033" summary="chert_update">
       <option name="closed" value="true" />
       <created>1715071097722</created>
@@ -547,7 +539,15 @@
       <option name="project" value="LOCAL" />
       <updated>1715769188282</updated>
     </task>
-    <option name="localTasksCounter" value="81" />
+    <task id="LOCAL-00081" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715774293223</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1715774293223</updated>
+    </task>
+    <option name="localTasksCounter" value="82" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
