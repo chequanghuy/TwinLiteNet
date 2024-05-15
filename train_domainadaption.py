@@ -63,7 +63,7 @@ def train_net(args):
         cudnn.benchmark = True
 
     criteria = TotalLoss(device=args.device)
-    criterion_mmd = MMDTotal(device=args.deveice)
+    criterion_mmd = MMDTotal(device=args.device)
     start_epoch = 0
     lr = args.lr
 
