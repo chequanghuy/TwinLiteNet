@@ -21,8 +21,15 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
-from itertools import cycle
+# from itertools import cycle
 
+def cycle(iterable):
+    iterator = iter(iterable)
+    while True:
+        try:
+            yield next(iterator)
+        except StopIteration:
+            iterator = iter(iterable)
 
 def resize(
         x: torch.Tensor,
@@ -123,7 +130,7 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
     # disc_model.train()
 
     total_batches = len(source_loader)
-    target_loader = cycle(iter(target_loader))
+    target_loader = cycle(target_loader)
     source_loader = enumerate(source_loader)
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
     LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'MMDLoss', 'TotalLoss'))
@@ -131,7 +138,7 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
         (_, source_input, source_label) = source_data
-        (_, target_input, _) = source_data
+        (_, target_input, _) = target_loader.__next__()
         if args.device == 'cuda:0':
             source_input = source_input.cuda().float()
             source_label[0] = source_label[0].cuda()
@@ -139,7 +146,7 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
             target_input = target_input.cuda().float()
         optimizer.zero_grad()
         source_output = model(source_input)
-        # target_output = model(target_input)
+        target_output = model(target_input)
 
         mmd_loss = 0
 
