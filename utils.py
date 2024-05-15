@@ -132,15 +132,15 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
     # disc_model.train()
 
     total_batches = len(source_loader)
-    target_loader = cycle(target_loader)
-    source_loader = enumerate(source_loader)
+    target_loader = enumerate(target_loader)
+    source_loader = cycle(source_loader)
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
     LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'MMDLoss', 'TotalLoss'))
     # pbar = tqdm(pbar, total=total_batches, )
-    pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
-    for i, (source_data) in pbar:
-        (_, source_input, source_label) = source_data
-        (_, target_input, _) = target_loader.__next__()
+    pbar = (tqdm(target_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
+    for i, (target_data) in pbar:
+        (_, source_input, source_label) = source_loader.__next__()
+        (_, target_input, _) = target_data
         if args.device == 'cuda:0':
             source_input = source_input.cuda().float()
             source_label[0] = source_label[0].cuda()
