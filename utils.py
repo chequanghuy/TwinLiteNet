@@ -148,7 +148,7 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
         source_output = model(source_input)
         target_output = model(target_input)
 
-        mmd_loss = 0
+        mmd_loss = criterion_mmd(source_output,target_output)
 
         output_source = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
 
