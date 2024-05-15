@@ -42,7 +42,7 @@ class MMDTotal(nn.Module):
         mmd_loss_da = self.mmd_loss(source_da_output, target_da_output)
         mmd_loss_ll = self.mmd_loss(source_ll_output, target_ll_ourput)
 
-        mmd_total = mmd_loss_da + mmd_loss_ll
+        mmd_total = 0.5*mmd_loss_da + 0.5*mmd_loss_ll
         return mmd_total
 
 
