@@ -2,12 +2,6 @@ import os
 import sys
 
 # put the directory efficientvit instead of '..'
-if args.engine == 'kaggle':
-    sys.path.insert(1, os.path.join(sys.path[0], '/kaggle/working/efficientvit'))
-    from efficientvit.seg_model_zoo import create_seg_model
-else:
-    sys.path.insert(1, os.path.join(sys.path[0], '/content/efficientvit'))
-    from efficientvit.seg_model_zoo import create_seg_model
 
 ######
 import torch
@@ -26,6 +20,13 @@ import torch.nn.functional as F
 import  torch.nn as nn
 
 def train_net(args):
+    if args.engine == 'kaggle':
+        sys.path.insert(1, os.path.join(sys.path[0], '/kaggle/working/efficientvit'))
+        from efficientvit.seg_model_zoo import create_seg_model
+    else:
+        sys.path.insert(1, os.path.join(sys.path[0], '/content/efficientvit'))
+        from efficientvit.seg_model_zoo import create_seg_model
+
     # load the model
     cuda_available = torch.cuda.is_available()
     num_gpus = torch.cuda.device_count()
