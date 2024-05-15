@@ -133,6 +133,7 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
         (_, source_input, source_label) = source_data
         (_, target_input, _) = target_loader.__next__()
         if args.device == 'cuda:0':
+            print('pfffff')
             source_input = source_input.cuda().float()
             source_label[0] = source_label[0].cuda()
             source_label[1] = source_label[1].cuda()
