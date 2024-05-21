@@ -12,12 +12,13 @@ from utils import train, valid, netParams, save_checkpoint, poly_lr_scheduler, p
 import torch.optim.lr_scheduler
 from torchvision.transforms import transforms as T
 import DataSet as myDataLoader
-from loss import TotalLoss, DiscriminatorLoss,MMDLoss, MMDTotal
+from loss import TotalLoss, DiscriminatorLoss, MMDLoss, MMDTotal
 import os
 import torch.backends.cudnn as cudnn
-from model.Discriminator import Discriminator
+from model.Discriminator import FCDiscriminator
 import torch.nn.functional as F
-import  torch.nn as nn
+import torch.nn as nn
+
 
 def train_net(args):
     if args.engine == 'kaggle':
@@ -47,9 +48,8 @@ def train_net(args):
 
     else:
         model = create_seg_model('b0', 'bdd', False)
-    # disc_model =
-    if num_gpus > 1:
-        model = torch.nn.DataParallel(model)
+    model_D = FCDiscriminator(num_classes=128)
+
 
     args.savedir = args.savedir + '/'
 
@@ -60,16 +60,27 @@ def train_net(args):
     if cuda_available:
         args.onGPU = True
         model = model.cuda()
+        model_D = model_D.cuda()
         cudnn.benchmark = True
 
     criteria = TotalLoss(device=args.device)
-    criterion_mmd = MMDTotal(device=args.device)
+    criteria_bce = torch.nn.MSELoss().to(args.device)
     start_epoch = 0
     lr = args.lr
+    lr_D = args.lr / 4
 
     optimizer = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
-    # disc_optimizer = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
+    optimizer_D = torch.optim.Adam(model_D.parameters(), lr=lr, betas=(0.9, 0.99), eps=1e-08, weight_decay=5e-4)
 
+    optimizer.zero_grad()
+    optimizer_D.zero_grad()
+
+    input_size = [512, 512]
+    input_size_target = [512, 512]
+
+
+    interp = nn.Upsample(size=(input_size[1], input_size[0]), mode='bilinear', align_corners=True)
+    interp_target = nn.Upsample(size=(input_size_target[1], input_size_target[0]), mode='bilinear', align_corners=True)
 
     if args.resume:
         if os.path.isfile(args.resume):
@@ -84,32 +95,33 @@ def train_net(args):
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
+    iadd_valLoader = myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='IADD')
 
-    # iadd_valLoader = torch.utils.data.DataLoader(
-    iadd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='IADD')
-    # bdd_valLoader = torch.utils.data.DataLoader(
-    bdd_valLoader=myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='bdd')
+    bdd_valLoader = myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='bdd')
+
     source_loader = torch.utils.data.DataLoader(
         myDataLoader.MyDataset(transform=transform, valid=False, engin=engine, data='bdd'),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
 
     target_loader = torch.utils.data.DataLoader(
-        myDataLoader.UlabeledDataset(transform=transform, engin=engine,data='IADD'),
+        myDataLoader.UlabeledDataset(transform=transform, engin=engine, data='IADD'),
         batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
+
+    # labels for adversarial training
+    source_label = 0
+    target_label = 1
 
     for epoch in range(start_epoch, args.max_epochs):
 
         model_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
         checkpoint_file_name = args.savedir + os.sep + 'checkpoint_{}.pth.tar'.format(epoch)
         poly_lr_scheduler(args, optimizer, epoch)
-        # poly_lr_scheduler(args, disc_optimizer, epoch)
+        poly_lr_scheduler(args, optimizer_D, epoch)
         for param_group in optimizer.param_groups:
             lr = param_group['lr']
         print("Learning rate: " + str(lr))
         # train for one epoch
-        model = model.to(args.device)
-        # disc_model = disc_model.cuda()
-        train(args, source_loader, target_loader, model, criteria, criterion_mmd, optimizer, epoch)
+        train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, optimizer, optimizer_D, epoch)
 
         # valid(model, iadd_valLoader)
         # valid(model, bdd_valLoader)
@@ -125,7 +137,6 @@ def train_net(args):
 
         valid(model, iadd_valLoader)
         valid(model, bdd_valLoader)
-
 
 
 if __name__ == '__main__':

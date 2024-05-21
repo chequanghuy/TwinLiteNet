@@ -125,12 +125,10 @@ def poly_lr_scheduler(args, optimizer, epoch, power=2):
     return lr
 
 
-def train(args, source_loader, target_loader, model, criterion, criterion_mmd, optimizer, epoch):
-    model.train()
-    for param in model.backbone.parameters():
-        param.required_grad = False
-    # disc_model.train()
+def train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
 
+    source_label = 0
+    target_label = 1
     total_batches = len(source_loader)
     target_loader = cycle(target_loader)
     source_loader = enumerate(source_loader)
@@ -139,40 +137,64 @@ def train(args, source_loader, target_loader, model, criterion, criterion_mmd, o
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
-        (_, source_input, source_label) = source_data
+
+        optimizer.zero_grad()
+        optimizer_D.zero_grad()
+
+        # train G
+        # don't accumulate grads in D
+        for param in model_D.parameters():
+            param.requires_grad = False
+
+        # train with source
+        (_, source_input, labels) = source_data
         (_, target_input, _) = target_loader.__next__()
         if args.device == 'cuda:0':
             source_input = source_input.cuda().float()
-            source_label[0] = source_label[0].cuda()
-            source_label[1] = source_label[1].cuda()
+            labels[0] = labels[0].cuda()
+            labels[1] = labels[1].cuda()
             target_input = target_input.cuda().float()
-        optimizer.zero_grad()
-        source_output = model(source_input)
-        target_output = model(target_input)
 
-        mmd_loss = 0.5 * criterion_mmd(source_output,target_output)
+        source_feature, source_output = model(source_input, model_D, 'source')
+        source_output = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
 
-        output_source = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
+        focal_loss, tversky_loss, loss = criterion(source_output, labels)
+        loss.backward()
 
-        # Source features labeled as 1, target features labeled as 0
-        # discriminator_input = torch.cat([source_features, target_features], dim=0)
-        # discriminator_labels = torch.cat([torch.ones(source_features.size(0)), torch.zeros(target_features.size(0))],dim=0).to(device)
-        # discriminator_output = disc_model(discriminator_input)
-        # disc_loss = criterion_discriminator(discriminator_output.squeeze(), discriminator_labels)
-        # disc_loss = F.binary_cross_entropy(discriminator_output.squeeze(), discriminator_labels)
-        # disc_loss.backward()
-        # disc_optimizer.step()
-        # disc_optimizer.zero_grad()
+        # train with target
+        target_feature, target_output = model(target_input, model_D, 'target')
+        loss_adv = 0
+        D_out = model_D(target_feature)
+        loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(args.device))
 
-        # Train segmentation model to fool the discriminator
-        # target_features = target_output.view(target_output.size(0), -1)
-        # discriminator_output = disc_model(target_features)
-        # adversarial_loss = F.binary_cross_entropy(discriminator_output.squeeze(),torch.ones(target_features.size(0)).to(device))
-        # adversarial_loss = criterion_adversarial(discriminator_output.squeeze(),torch.ones(target_features.size(0)).to(device))
-        focal_loss, tversky_loss, loss = criterion(output_source, source_label)
+        loss_adv = loss_adv * 0.01
+        loss_adv.backward()
 
-        total_loss = loss + mmd_loss
-        total_loss.backward()
+        optimizer.step()
+
+        # train D
+        # bring back requires_grad
+        for param in model_D.parameters():
+            param.requires_grad = True
+
+        # train with source
+        loss_D_source = 0
+
+        D_out_source = model_D(source_feature.detach())
+        loss_D_source += criterion_bce(D_out_source, torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(args.device))
+        loss_D_source.backward()
+
+        # train with target
+        loss_D_target = 0
+
+        D_out_target = model_D(target_feature.detach())
+        loss_D_target += criterion_bce(D_out_target,torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(args.device))
+        loss_D_target.backward()
+
+        optimizer_D.step()
+
+        # total_loss = loss
+        # total_loss.backward()
         optimizer.step()
 
         pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
