@@ -159,8 +159,8 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         print('ooooooooooooooooooooo',source_output[0].shape)
         source_output = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
 
-        focal_loss, tversky_loss, loss = criterion(source_output, labels)
-        loss.backward()
+        # focal_loss, tversky_loss, loss = criterion(source_output, labels)
+        # loss.backward()
 
         # train with target
         target_feature, target_output = model(target_input, model_D, 'target')
