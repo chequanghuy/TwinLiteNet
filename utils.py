@@ -201,7 +201,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         optimizer.step()
 
         pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
-                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss,loss_adv, loss_D_target, loss.item()))
+                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss,loss_adv, loss_D_target, loss))
 
 
 def train16fp(args, train_loader, model, criterion, optimizer, epoch, scaler):
