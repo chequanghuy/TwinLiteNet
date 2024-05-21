@@ -151,6 +151,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         (_, target_input, _) = target_loader.__next__()
         if args.device == 'cuda:0':
             source_input = source_input.cuda().float()
+            print('source_inputooooooooooooooooooooo', source_input.shape)
             labels[0] = labels[0].cuda()
             labels[1] = labels[1].cuda()
             target_input = target_input.cuda().float()
