@@ -45,8 +45,6 @@ def train_net(args):
     engine = args.engine
     if pretrained is not None:
         model = create_seg_model('b0', 'bdd', weight_url=pretrained)
-
-
     else:
         model = create_seg_model('b0', 'bdd', False)
 
@@ -122,7 +120,7 @@ def train_net(args):
     for epoch in range(start_epoch, args.max_epochs):
 
         model_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
-        model_D_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
+        model_D_file_name = args.savedir + os.sep + 'Dmodel_{}.pth'.format(epoch)
 
         checkpoint_file_name = args.savedir + os.sep + 'checkpoint_{}.pth.tar'.format(epoch)
         poly_lr_scheduler(args, optimizer, epoch)
