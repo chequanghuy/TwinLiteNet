@@ -156,7 +156,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
             target_input = target_input.cuda().float()
 
         source_feature, source_output = model(source_input, model_D, 'source')
-        print('ooooooooooooooooooooo',source_output[0].shape)
+        print('ooooooooooooooooooooo',source_output[0].unsqueeze(0).shape)
         source_output = (resize(source_output[0].unsqueeze(0), [512, 512]), resize(source_output[1].unsqueeze(0), [512, 512]))
 
         focal_loss, tversky_loss, loss = criterion(source_output, labels)
