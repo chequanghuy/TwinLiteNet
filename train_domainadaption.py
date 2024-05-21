@@ -162,6 +162,7 @@ if __name__ == '__main__':
     parser.add_argument('--savedir', default='./test_', help='directory to save the results')
     parser.add_argument('--resume', type=str, default='', help='Use this flag to load last checkpoint for training')
     parser.add_argument('--pretrained', default=None, help='Pretrained ESPNetv2 weights.')
+    parser.add_argument('--dpretrained', default=None, help='Pretrained ESPNetv2 weights.')
     parser.add_argument('--pseudo', default=True, help='Pretrained ESPNetv2 weights.')
     parser.add_argument('--engine', default='kaggle', help='choose youre prefered engine, kaggle or colab.')
 
