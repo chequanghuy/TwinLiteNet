@@ -41,6 +41,7 @@ def train_net(args):
 
     ])
     pretrained = args.pretrained
+    D_pretrained = args.dpretrained
     engine = args.engine
     if pretrained is not None:
         model = create_seg_model('b0', 'bdd', weight_url=pretrained)
@@ -48,7 +49,13 @@ def train_net(args):
 
     else:
         model = create_seg_model('b0', 'bdd', False)
-    model_D = FCDiscriminator(num_classes=128)
+
+    if D_pretrained is not None:
+        model_D = FCDiscriminator(num_classes=128)
+        model_D.load_state_dict(torch.load(D_pretrained))
+    else:
+        model_D = FCDiscriminator(num_classes=128)
+    # model_D = FCDiscriminator(num_classes=128)
 
 
     args.savedir = args.savedir + '/'
@@ -95,6 +102,7 @@ def train_net(args):
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
+
     iadd_valLoader = myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='IADD')
 
     bdd_valLoader = myDataLoader.MyDataset(transform=transform, valid=True, engin=engine, data='bdd')
@@ -114,6 +122,8 @@ def train_net(args):
     for epoch in range(start_epoch, args.max_epochs):
 
         model_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
+        model_D_file_name = args.savedir + os.sep + 'model_{}.pth'.format(epoch)
+
         checkpoint_file_name = args.savedir + os.sep + 'checkpoint_{}.pth.tar'.format(epoch)
         poly_lr_scheduler(args, optimizer, epoch)
         poly_lr_scheduler(args, optimizer_D, epoch)
@@ -127,6 +137,7 @@ def train_net(args):
         # valid(model, bdd_valLoader)
 
         torch.save(model.state_dict(), model_file_name)
+        torch.save(model_D.state_dict(), model_D_file_name)
 
         save_checkpoint({
             'epoch': epoch + 1,
