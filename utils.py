@@ -151,15 +151,15 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         (_, target_input, _) = target_loader.__next__()
         if args.device == 'cuda:0':
             source_input = source_input.cuda().float()
-            print('source_inputooooooooooooooooooooo', source_input.shape)
+            # print('source_inputooooooooooooooooooooo', source_input.shape)
             labels[0] = labels[0].cuda()
             labels[1] = labels[1].cuda()
             target_input = target_input.cuda().float()
 
         source_feature, source_output = model(source_input, model_D, 'source')
-        print('ooooooooooooooooooooo',source_output[0].unsqueeze(0).shape)
-        print('labelsooooooooooooooooooooo', labels[0].shape)
-        source_output = (resize(source_output[0].unsqueeze(0), [512, 512]), resize(source_output[1].unsqueeze(0), [512, 512]))
+        # print('ooooooooooooooooooooo',source_output[0].unsqueeze(0).shape)
+        # print('labelsooooooooooooooooooooo', labels[0].shape)
+        source_output = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
 
         focal_loss, tversky_loss, loss = criterion(source_output, labels)
         loss.backward()
