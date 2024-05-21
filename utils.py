@@ -133,7 +133,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
     target_loader = cycle(target_loader)
     source_loader = enumerate(source_loader)
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
-    LOGGER.info(('\n' + '%13s' * 6) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'loss_adv','loss_D_target', 'TotalLoss'))
+    LOGGER.info(('\n' + '%13s' * 6) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'loss_adv', 'loss_D_target', 'TotalLoss'))
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
@@ -157,6 +157,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
 
         source_feature, source_output = model(source_input, model_D, 'source')
         print('ooooooooooooooooooooo',source_output[0].unsqueeze(0).shape)
+        print('labelsooooooooooooooooooooo', labels[0].shape)
         source_output = (resize(source_output[0].unsqueeze(0), [512, 512]), resize(source_output[1].unsqueeze(0), [512, 512]))
 
         focal_loss, tversky_loss, loss = criterion(source_output, labels)
