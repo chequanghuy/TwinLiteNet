@@ -254,7 +254,8 @@ def val(val_loader, model):
         target_var = target
 
         with torch.no_grad():
-            output = model(input_var)
+            _, output = model(source_input, None, 'source')
+            # output = model(input_var)
             output = (resize(output[0], [512, 512]), resize(output[1], [512, 512]))
 
         out_da, out_ll = output

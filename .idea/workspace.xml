@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7e27571b-ca55-4a02-ae51-2758e7b03021" name="Changes" comment="change pbar">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train_domainadaption.py" beforeDir="false" afterPath="$PROJECT_DIR$/train_domainadaption.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -159,14 +158,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1714381415492</updated>
-    </task>
-    <task id="LOCAL-00048" summary="chert_update">
-      <option name="closed" value="true" />
-      <created>1715690769172</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1715690769172</updated>
     </task>
     <task id="LOCAL-00049" summary="chert_update">
       <option name="closed" value="true" />
@@ -552,7 +543,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716320976170</updated>
     </task>
-    <option name="localTasksCounter" value="97" />
+    <task id="LOCAL-00097" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716325752512</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1716325752512</updated>
+    </task>
+    <option name="localTasksCounter" value="98" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
