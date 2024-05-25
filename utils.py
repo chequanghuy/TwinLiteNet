@@ -184,18 +184,20 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         loss_D_source = 0
 
         D_out_source = model_D(source_feature.detach())
+        print('D_out_source:',D_out_source)
         loss_D_source += criterion_bce(D_out_source, torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(args.device))
         loss_D_source.backward()
+        print('SSSSSSS',loss_D_source)
 
         # train with target
         loss_D_target = 0
 
         D_out_target = model_D(target_feature.detach())
+        print('D_out_target:',D_out_target)
         loss_D_target += criterion_bce(D_out_target,torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(args.device))
         loss_D_target.backward()
-
+        print('TTTT',loss_D_target)
         optimizer_D.step()
-
         # total_loss = loss
         # total_loss.backward()
         optimizer.step()
