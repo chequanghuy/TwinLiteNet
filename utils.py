@@ -214,7 +214,7 @@ def dast_train(args, source_loader, target_loader, model,model_D, criterion, cri
     target_loader = cycle(target_loader)
     source_loader = enumerate(source_loader)
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
-    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'DtargetLoss', 'TotalLoss'))
+    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'AdvLoss', 'TotalLoss'))
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
@@ -250,7 +250,7 @@ def dast_train(args, source_loader, target_loader, model,model_D, criterion, cri
         D_out = model_D(target_feature)
         loss_adv = criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(args.device))
 
-        loss_adv = loss_adv * 0.01
+        loss_adv = loss_adv * 0.1
         # loss_adv.backward()
 
         optimizer.step()
