@@ -206,7 +206,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss_D_target, loss))
 
 
-def train16fp(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
+def dast_train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
 
     source_label = 0
     target_label = 1
@@ -247,9 +247,8 @@ def train16fp(args, source_loader, target_loader, model,model_D, criterion, crit
 
         # train with target
         target_feature, target_output = model(target_input, model_D, 'target')
-        loss_adv = 0
         D_out = model_D(target_feature)
-        loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(args.device))
+        loss_adv = criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(args.device))
 
         loss_adv = loss_adv * 0.01
         loss_adv.backward()
@@ -262,30 +261,24 @@ def train16fp(args, source_loader, target_loader, model,model_D, criterion, crit
             param.requires_grad = True
 
         # train with source
-        loss_D_source = 0
 
         D_out_source = model_D(source_feature.detach())
-        print('D_out_source:',D_out_source)
-        loss_D_source += criterion_bce(D_out_source, torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(args.device))
+        loss_D_source = criterion_bce(D_out_source, torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(args.device))
         loss_D_source.backward()
-        print('SSSSSSS',loss_D_source)
 
         # train with target
-        loss_D_target = 0
 
         D_out_target = model_D(target_feature.detach())
-        print('D_out_target:',D_out_target)
-        loss_D_target += criterion_bce(D_out_target,torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(args.device))
+        loss_D_target = criterion_bce(D_out_target,torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(args.device))
         loss_D_target.backward()
-        print('TTTT',loss_D_target)
         optimizer_D.step()
 
-        # total_loss = loss
-        # total_loss.backward()
+        total_loss = loss + loss_adv
+        total_loss.backward()
         optimizer.step()
 
         pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
-                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss_D_target, loss))
+                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss_adv, total_loss))
 
 
 @torch.no_grad()

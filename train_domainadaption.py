@@ -8,7 +8,7 @@ import torch
 import pickle
 import torch.backends.cudnn as cudnn
 from argparse import ArgumentParser
-from utils import train, valid, netParams, save_checkpoint, poly_lr_scheduler, pseudo_label_maker
+from utils import train, valid, netParams, save_checkpoint, poly_lr_scheduler, pseudo_label_maker,dast_train
 import torch.optim.lr_scheduler
 from torchvision.transforms import transforms as T
 import DataSet as myDataLoader
@@ -129,7 +129,7 @@ def train_net(args):
             lr = param_group['lr']
         print("Learning rate: " + str(lr))
         # train for one epoch
-        train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, optimizer, optimizer_D, epoch)
+        dast_train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, optimizer, optimizer_D, epoch)
 
         # valid(model, iadd_valLoader)
         # valid(model, bdd_valLoader)
