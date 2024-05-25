@@ -204,26 +204,86 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss_D_target, loss))
 
 
-def train16fp(args, train_loader, model, criterion, optimizer, epoch, scaler):
-    model.train()
-    print("16fp-------------------")
-    total_batches = len(train_loader)
-    pbar = enumerate(train_loader)
-    LOGGER.info(('\n' + '%13s' * 4) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'TotalLoss'))
-    pbar = tqdm(pbar, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}')
-    for i, (_, input, target) in pbar:
-        optimizer.zero_grad()
-        if args.onGPU == True:
-            input = input.cuda().float()
-        output = model(input)
-        with torch.cuda.amp.autocast():
-            focal_loss, tversky_loss, loss = criterion(output, target)
+def train16fp(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
 
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
-        pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
-                             (f'{epoch}/{300 - 1}', tversky_loss, focal_loss, loss.item()))
+    source_label = 0
+    target_label = 1
+    total_batches = len(source_loader)
+    target_loader = cycle(target_loader)
+    source_loader = enumerate(source_loader)
+    # pbar = enumerate(zip(source_loader, cycle(target_loader)))
+    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'DtargetLoss', 'TotalLoss'))
+    # pbar = tqdm(pbar, total=total_batches, )
+    pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
+    for i, (source_data) in pbar:
+
+        optimizer.zero_grad()
+        optimizer_D.zero_grad()
+
+        # train G
+        # don't accumulate grads in D
+        for param in model_D.parameters():
+            param.requires_grad = False
+
+        # train with source
+        (_, source_input, labels) = source_data
+        (_, target_input, _) = target_loader.__next__()
+        if args.device == 'cuda:0':
+            source_input = source_input.cuda().float()
+            # print('source_inputooooooooooooooooooooo', source_input.shape)
+            labels[0] = labels[0].cuda()
+            labels[1] = labels[1].cuda()
+            target_input = target_input.cuda().float()
+
+        source_feature, source_output = model(source_input, model_D, 'source')
+        # print('ooooooooooooooooooooo',source_output[0].unsqueeze(0).shape)
+        # print('labelsooooooooooooooooooooo', labels[0].shape)
+        source_output = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
+
+        focal_loss, tversky_loss, loss = criterion(source_output, labels)
+        loss.backward()
+
+        # train with target
+        target_feature, target_output = model(target_input, model_D, 'target')
+        loss_adv = 0
+        D_out = model_D(target_feature)
+        loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(args.device))
+
+        loss_adv = loss_adv * 0.01
+        loss_adv.backward()
+
+        optimizer.step()
+
+        # train D
+        # bring back requires_grad
+        for param in model_D.parameters():
+            param.requires_grad = True
+
+        # train with source
+        loss_D_source = 0
+
+        D_out_source = model_D(source_feature.detach())
+        print('D_out_source:',D_out_source)
+        loss_D_source += criterion_bce(D_out_source, torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(args.device))
+        loss_D_source.backward()
+        print('SSSSSSS',loss_D_source)
+
+        # train with target
+        loss_D_target = 0
+
+        D_out_target = model_D(target_feature.detach())
+        print('D_out_target:',D_out_target)
+        loss_D_target += criterion_bce(D_out_target,torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(args.device))
+        loss_D_target.backward()
+        print('TTTT',loss_D_target)
+        optimizer_D.step()
+
+        # total_loss = loss
+        # total_loss.backward()
+        optimizer.step()
+
+        pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
+                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss_D_target, loss))
 
 
 @torch.no_grad()

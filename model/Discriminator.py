@@ -64,14 +64,20 @@ class OutspaceDiscriminator(nn.Module):
 
         return x
 
-# if __name__ == "__main__" :
-#     x = torch.randn([16,2,64,64])
-#     # x = x.view(x.size(0), -1)
-#     net = FCDiscriminator(num_classes=2048)
-#     # device = 'cuda'
-#     # num_class_list = [2048, 2]
-#     # [print('FCDiscriminator',num_class_list[i]) if i < 1 else print('OutspaceDiscriminator',num_class_list[i]) for i in range(2)]
-#
-#
-#     # p = net(x)
-    # print(p.shape)
+if __name__ == "__main__" :
+    import os
+    import sys
+
+    sys.path.insert(1, os.path.join(sys.path[0], '../efficientvit/efficientvit'))
+    from seg_model_zoo import create_seg_model
+
+    x = torch.randn([16,3,512,512])
+    # x = x.view(x.size(0), -1)
+    net = FCDiscriminator(num_classes=128)
+    # device = 'cuda'
+    # num_class_list = [2048, 2]
+    # [print('FCDiscriminator',num_class_list[i]) if i < 1 else print('OutspaceDiscriminator',num_class_list[i]) for i in range(2)]
+
+    model = create_seg_model('b0','bdd',weight_url='/TwinLiteNet/model/model_149.pth')
+    p = net(x)
+    print(p.shape)
