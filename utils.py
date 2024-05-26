@@ -229,7 +229,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
 
         optimizer_D.step()
         pbar.set_description(('%13s' * 1 + '%13.4g' * 6) %
-                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total, focal_loss_total, loss_adv_total, loss_D_target_total, loss_D_source_total, loss_total))
+                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total.avg, focal_loss_total.avg, loss_adv_total.avg, loss_D_target_total.avg, loss_D_source_total.avg, loss_total.avg))
 
 
 def dast_train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
