@@ -15,7 +15,7 @@ import DataSet as myDataLoader
 from loss import TotalLoss, DiscriminatorLoss, MMDLoss, MMDTotal
 import os
 import torch.backends.cudnn as cudnn
-from model.Discriminator import FCDiscriminator
+from model.Discriminator import FCDiscriminator,OutspaceDiscriminator
 import torch.nn.functional as F
 import torch.nn as nn
 
@@ -49,10 +49,10 @@ def train_net(args):
         model = create_seg_model('b0', 'bdd', False)
 
     if D_pretrained is not None:
-        model_D = FCDiscriminator(num_classes=128)
+        model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2)])
         model_D.load_state_dict(torch.load(D_pretrained))
     else:
-        model_D = FCDiscriminator(num_classes=128)
+        model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2)])
     # model_D = FCDiscriminator(num_classes=128)
 
 
@@ -65,7 +65,8 @@ def train_net(args):
     if cuda_available:
         args.onGPU = True
         model = model.cuda()
-        model_D = model_D.cuda()
+        model_D[0] = model_D[0].cuda()
+        model_D[1] = model_D[1].cuda()
         cudnn.benchmark = True
 
     criteria = TotalLoss(device=args.device)

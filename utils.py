@@ -126,7 +126,7 @@ def poly_lr_scheduler(args, optimizer, epoch, power=2):
 
 
 def train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
-
+    device = args.device
     source_label = 0
     target_label = 1
     total_batches = len(source_loader)
@@ -156,17 +156,19 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
             target_input = target_input.cuda().float()
 
         source_feature, source_output = model(source_input, model_D, 'source')
-        source_output = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
+        source_output_resized = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
 
-        focal_loss, tversky_loss, loss = criterion(source_output, labels)
+        focal_loss, tversky_loss, loss = criterion(source_output_resized, labels)
         loss.backward()
 
         # train with target
         target_feature, target_output = model(target_input, model_D, 'target')
-        loss_adv = 0
-        D_out = model_D(target_feature)
-        loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(args.device))
 
+        loss_adv = 0
+        D_out = model_D[0](target_feature)
+        loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(device))
+        D_out = model_D[1](F.softmax(target_output, dim=1))
+        loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(device))
         loss_adv = loss_adv * 0.01
         loss_adv.backward()
 
@@ -179,22 +181,25 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
 
         # train with source
         loss_D_source = 0
-
-        D_out_source = model_D(source_feature.detach())
-        loss_D_source += criterion_bce(D_out_source, torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(args.device))
+        D_out_source = model_D[0](source_feature.detach())
+        loss_D_source += criterion_bce(D_out_source,
+                                  torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(device))
+        D_out_source = model_D[1](F.softmax(source_output.detach(), dim=1))
+        loss_D_source += criterion_bce(D_out_source,
+                                  torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(device))
         loss_D_source.backward()
 
         # train with target
         loss_D_target = 0
-
-        D_out_target = model_D(target_feature.detach())
-        loss_D_target += criterion_bce(D_out_target,torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(args.device))
+        D_out_target = model_D[0](target_feature.detach())
+        loss_D_target += criterion_bce(D_out_target,
+                                  torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(device))
+        D_out_target = model_D[1](F.softmax(target_output.detach(), dim=1))
+        loss_D_target += criterion_bce(D_out_target,
+                                  torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(device))
         loss_D_target.backward()
-        optimizer_D.step()
-        # total_loss = loss
-        # total_loss.backward()
-        optimizer.step()
 
+        optimizer_D.step()
         pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss_D_target, loss))
 

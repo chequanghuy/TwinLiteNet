@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7e27571b-ca55-4a02-ae51-2758e7b03021" name="Changes" comment="change pbar">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train_domainadaption.py" beforeDir="false" afterPath="$PROJECT_DIR$/train_domainadaption.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -159,22 +160,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1714381415492</updated>
-    </task>
-    <task id="LOCAL-00053" summary="chert_update">
-      <option name="closed" value="true" />
-      <created>1715693966998</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1715693966998</updated>
-    </task>
-    <task id="LOCAL-00054" summary="chert_update">
-      <option name="closed" value="true" />
-      <created>1715751456785</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1715751456786</updated>
     </task>
     <task id="LOCAL-00055" summary="chert_update">
       <option name="closed" value="true" />
@@ -552,7 +537,23 @@
       <option name="project" value="LOCAL" />
       <updated>1716455171107</updated>
     </task>
-    <option name="localTasksCounter" value="102" />
+    <task id="LOCAL-00102" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716718564206</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1716718564208</updated>
+    </task>
+    <task id="LOCAL-00103" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716718658199</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1716718658199</updated>
+    </task>
+    <option name="localTasksCounter" value="104" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
