@@ -142,7 +142,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
     LOGGER.info(('\n' + '%13s' * 7) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'ADVLoss', 'DsourceLoss', 'DtargetLoss', 'TotalsegLoss' ))
     # pbar = tqdm(pbar, total=total_batches, )
-    pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
+    pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:20}{r_bar}'))
     for i, (source_data) in pbar:
 
         optimizer.zero_grad()
