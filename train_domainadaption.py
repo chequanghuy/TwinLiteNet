@@ -129,7 +129,11 @@ def train_net(args):
             lr = param_group['lr']
         print("Learning rate: " + str(lr))
         # train for one epoch
-        dast_train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, optimizer, optimizer_D, epoch)
+        if args.mode == 'DA':
+            train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, optimizer, optimizer_D,
+                  epoch)
+        elif args.mode == 'DAST':
+            dast_train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, optimizer, optimizer_D, epoch)
 
         # valid(model, iadd_valLoader)
         # valid(model, bdd_valLoader)
@@ -163,5 +167,6 @@ if __name__ == '__main__':
     parser.add_argument('--dpretrained', default=None, help='Pretrained ESPNetv2 weights.')
     parser.add_argument('--pseudo', default=True, help='Pretrained ESPNetv2 weights.')
     parser.add_argument('--engine', default='kaggle', help='choose youre prefered engine, kaggle or colab.')
+    parser.add_argument('--mode', default='DA', help='DA mode or DAST mode?.')
 
     train_net(parser.parse_args())
