@@ -215,7 +215,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         loss_D_target.backward()
 
         optimizer_D.step()
-        pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
+        pbar.set_description(('%13s' * 1 + '%13.4g' * 6) %
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss_adv, loss_D_target, loss_D_source, loss))
 
 
