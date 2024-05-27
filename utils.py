@@ -146,12 +146,6 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
-        loss_total.reset()
-        tversky_loss_total.reset()
-        focal_loss_total.reset()
-        loss_adv_total.reset()
-        loss_D_target_total.reset()
-        loss_D_source_total.reset()
 
         optimizer.zero_grad()
         optimizer_D.zero_grad()
@@ -239,6 +233,12 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         pbar.set_description(('%13s' * 1 + '%13.4g' * 6) %
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total.avg, focal_loss_total.avg, loss_adv_total.avg, loss_D_target_total.avg, loss_D_source_total.avg, loss_total.avg))
 
+        loss_total.reset()
+        tversky_loss_total.reset()
+        focal_loss_total.reset()
+        loss_adv_total.reset()
+        loss_D_target_total.reset()
+        loss_D_source_total.reset()
 
 def dast_train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
 
