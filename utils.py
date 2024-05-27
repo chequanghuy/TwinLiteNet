@@ -142,7 +142,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
     LOGGER.info(('\n' + '%13s' * 7) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'ADVLoss', 'DsourceLoss', 'DtargetLoss', 'TotalsegLoss' ))
     # pbar = tqdm(pbar, total=total_batches, )
-    pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:20}{r_bar}'))
+    pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
 
         optimizer.zero_grad()
@@ -184,7 +184,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         loss_adv_da = criterion_bce(D_out_da, torch.FloatTensor(D_out_da.data.size()).fill_(source_label).to(device))
         loss_adv_ll = criterion_bce(D_out_ll, torch.FloatTensor(D_out_ll.data.size()).fill_(source_label).to(device))
 
-        loss_adv = loss_adv_da * 0.01 + loss_adv_ll * 0.01 + loss_adv * 0.01
+        loss_adv = loss_adv_da * 0.1 + loss_adv_ll * 0.1 + loss_adv * 0.1
         loss_adv_total.update(loss_adv,args.batch_size)
         loss_adv.backward()
 
