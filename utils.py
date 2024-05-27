@@ -136,6 +136,8 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
     loss_D_target_total = AverageMeter()
     loss_D_source_total = AverageMeter()
 
+    criterion_bce = torch.nn.MSELoss()
+
     total_batches = len(source_loader)
     target_loader = cycle(target_loader)
     source_loader = enumerate(source_loader)
@@ -144,6 +146,12 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
+        loss_total.reset()
+        tversky_loss_total.reset()
+        focal_loss_total.reset()
+        loss_adv_total.reset()
+        loss_D_target_total.reset()
+        loss_D_source_total.reset()
 
         optimizer.zero_grad()
         optimizer_D.zero_grad()
@@ -177,7 +185,7 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         loss_adv = 0
 
         D_out = model_D[0](target_feature)
-        loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(device))
+        loss_adv = criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(device))
         D_out_da = model_D[1](F.softmax(target_output[0], dim=1))
         D_out_ll = model_D[2](F.softmax(target_output[1], dim=1))
 
@@ -239,6 +247,16 @@ def dast_train(args, source_loader, target_loader, model,model_D, criterion, cri
     total_batches = len(source_loader)
     target_loader = cycle(target_loader)
     source_loader = enumerate(source_loader)
+
+    loss_total = AverageMeter()
+    tversky_loss_total = AverageMeter()
+    focal_loss_total = AverageMeter()
+    loss_adv_total = AverageMeter()
+    loss_D_target_total = AverageMeter()
+    loss_D_source_total = AverageMeter()
+
+    device = args.device
+
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
     LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'AdvLoss', 'TotalLoss'))
     # pbar = tqdm(pbar, total=total_batches, )
@@ -271,20 +289,16 @@ def dast_train(args, source_loader, target_loader, model,model_D, criterion, cri
         # train with target
         target_feature, target_output = model(target_input, model_D, 'target')
 
-        loss_adv = 0
-
         D_out = model_D[0](target_feature)
-        loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(device))
+        loss_adv1 = criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(device))
         D_out_da = model_D[1](F.softmax(target_output[0], dim=1))
         D_out_ll = model_D[1](F.softmax(target_output[1], dim=1))
 
         loss_adv_da = criterion_bce(D_out_da, torch.FloatTensor(D_out_da.data.size()).fill_(source_label).to(device))
         loss_adv_ll = criterion_bce(D_out_ll, torch.FloatTensor(D_out_ll.data.size()).fill_(source_label).to(device))
 
-        loss_adv = loss_adv_da * 0.1 + loss_adv_ll * 0.1 + loss_adv * 0.1
+        loss_adv = loss_adv_da * 0.1 + loss_adv_ll * 0.1 + loss_adv1 * 0.1
         loss_adv_total.update(loss_adv,args.batch_size)
-        loss_adv.backward()
-
         optimizer.step()
 
         # train D
@@ -293,34 +307,32 @@ def dast_train(args, source_loader, target_loader, model,model_D, criterion, cri
             param.requires_grad = True
 
         # train with source
-        loss_D_source = 0
 
         D_out_source = model_D[0](source_feature.detach())
-        loss_D_source += criterion_bce(D_out_source,
+        loss_D_source1 = criterion_bce(D_out_source,
                                   torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(device))
         D_out_source_da = model_D[1](F.softmax(source_output[0].detach(), dim=1))
-        D_out_source_ll = model_D[1](F.softmax(source_output[1].detach(), dim=1))
+        D_out_source_ll = model_D[2](F.softmax(source_output[1].detach(), dim=1))
 
         loss_D_source_da = criterion_bce(D_out_source_da,
                                   torch.FloatTensor(D_out_source_da.data.size()).fill_(source_label).to(device))
         loss_D_source_ll = criterion_bce(D_out_source_ll,
                                   torch.FloatTensor(D_out_source_ll.data.size()).fill_(source_label).to(device))
-        loss_D_source = loss_D_source + loss_D_source_da + loss_D_source_ll
+        loss_D_source = loss_D_source1 + loss_D_source_da + loss_D_source_ll
         loss_D_source_total.update(loss_D_source,args.batch_size)
         loss_D_source.backward()
 
         # train with target
-        loss_D_target = 0
         D_out_target = model_D[0](target_feature.detach())
-        loss_D_target += criterion_bce(D_out_target,
+        loss_D_target1 = criterion_bce(D_out_target,
                                   torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(device))
         D_out_target_da = model_D[1](F.softmax(target_output[0].detach(), dim=1))
-        D_out_target_ll = model_D[1](F.softmax(target_output[1].detach(), dim=1))
+        D_out_target_ll = model_D[2](F.softmax(target_output[1].detach(), dim=1))
         loss_D_target_da = criterion_bce(D_out_target_da,
                                   torch.FloatTensor(D_out_target_da.data.size()).fill_(target_label).to(device))
         loss_D_target_ll = criterion_bce(D_out_target_ll,
                                   torch.FloatTensor(D_out_target_ll.data.size()).fill_(target_label).to(device))
-        loss_D_target = loss_D_target + loss_D_target_da + loss_D_target_ll
+        loss_D_target = loss_D_target1 + loss_D_target_da + loss_D_target_ll
         loss_D_target_total.update(loss_D_target,args.batch_size)
         loss_D_target.backward()
 

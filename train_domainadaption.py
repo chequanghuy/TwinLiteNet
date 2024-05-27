@@ -135,7 +135,8 @@ def train_net(args):
             train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, optimizer, optimizer_D,
                   epoch)
         elif args.mode == 'DAST':
-            dast_train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, optimizer, optimizer_D, epoch)
+            criteria_bce2 = torch.nn.MSELoss(reduce=False, reduction='none')
+            dast_train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, criteria_bce2, optimizer, optimizer_D, epoch)
 
         # valid(model, iadd_valLoader)
         # valid(model, bdd_valLoader)
