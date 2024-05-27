@@ -179,6 +179,103 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         D_out = model_D[0](target_feature)
         loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(device))
         D_out_da = model_D[1](F.softmax(target_output[0], dim=1))
+        D_out_ll = model_D[2](F.softmax(target_output[1], dim=1))
+
+        loss_adv_da = criterion_bce(D_out_da, torch.FloatTensor(D_out_da.data.size()).fill_(source_label).to(device))
+        loss_adv_ll = criterion_bce(D_out_ll, torch.FloatTensor(D_out_ll.data.size()).fill_(source_label).to(device))
+
+        loss_adv = loss_adv_da * 0.1 + loss_adv_ll * 0.1 + loss_adv * 0.1
+        loss_adv_total.update(loss_adv,args.batch_size)
+        loss_adv.backward()
+
+        optimizer.step()
+
+        # train D
+        # bring back requires_grad
+        for param in model_D.parameters():
+            param.requires_grad = True
+
+        # train with source
+        loss_D_source = 0
+
+        D_out_source = model_D[0](source_feature.detach())
+        loss_D_source += criterion_bce(D_out_source,
+                                  torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(device))
+        D_out_source_da = model_D[1](F.softmax(source_output[0].detach(), dim=1))
+        D_out_source_ll = model_D[2](F.softmax(source_output[1].detach(), dim=1))
+
+        loss_D_source_da = criterion_bce(D_out_source_da,
+                                  torch.FloatTensor(D_out_source_da.data.size()).fill_(source_label).to(device))
+        loss_D_source_ll = criterion_bce(D_out_source_ll,
+                                  torch.FloatTensor(D_out_source_ll.data.size()).fill_(source_label).to(device))
+        loss_D_source = loss_D_source + loss_D_source_da + loss_D_source_ll
+        loss_D_source_total.update(loss_D_source,args.batch_size)
+        loss_D_source.backward()
+
+        # train with target
+        loss_D_target = 0
+        D_out_target = model_D[0](target_feature.detach())
+        loss_D_target += criterion_bce(D_out_target,
+                                  torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(device))
+        D_out_target_da = model_D[1](F.softmax(target_output[0].detach(), dim=1))
+        D_out_target_ll = model_D[2](F.softmax(target_output[1].detach(), dim=1))
+        loss_D_target_da = criterion_bce(D_out_target_da,
+                                  torch.FloatTensor(D_out_target_da.data.size()).fill_(target_label).to(device))
+        loss_D_target_ll = criterion_bce(D_out_target_ll,
+                                  torch.FloatTensor(D_out_target_ll.data.size()).fill_(target_label).to(device))
+        loss_D_target = loss_D_target + loss_D_target_da + loss_D_target_ll
+        loss_D_target_total.update(loss_D_target,args.batch_size)
+        loss_D_target.backward()
+
+        optimizer_D.step()
+        pbar.set_description(('%13s' * 1 + '%13.4g' * 6) %
+                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total.avg, focal_loss_total.avg, loss_adv_total.avg, loss_D_target_total.avg, loss_D_source_total.avg, loss_total.avg))
+
+
+def dast_train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
+
+    source_label = 0
+    target_label = 1
+    total_batches = len(source_loader)
+    target_loader = cycle(target_loader)
+    source_loader = enumerate(source_loader)
+    # pbar = enumerate(zip(source_loader, cycle(target_loader)))
+    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'AdvLoss', 'TotalLoss'))
+    # pbar = tqdm(pbar, total=total_batches, )
+    pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
+    for i, (source_data) in pbar:
+
+        optimizer.zero_grad()
+        optimizer_D.zero_grad()
+
+        # train G
+        # don't accumulate grads in D
+        for param in model_D.parameters():
+            param.requires_grad = False
+
+        # train with source
+        (_, source_input, labels) = source_data
+        (_, target_input, _) = target_loader.__next__()
+        if args.device == 'cuda:0':
+            source_input = source_input.cuda().float()
+
+            labels[0] = labels[0].cuda()
+            labels[1] = labels[1].cuda()
+            target_input = target_input.cuda().float()
+
+        source_feature, source_output = model(source_input, model_D, 'source')
+        source_output = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
+
+        focal_loss, tversky_loss, loss = criterion(source_output, labels)
+
+        # train with target
+        target_feature, target_output = model(target_input, model_D, 'target')
+
+        loss_adv = 0
+
+        D_out = model_D[0](target_feature)
+        loss_adv += criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(device))
+        D_out_da = model_D[1](F.softmax(target_output[0], dim=1))
         D_out_ll = model_D[1](F.softmax(target_output[1], dim=1))
 
         loss_adv_da = criterion_bce(D_out_da, torch.FloatTensor(D_out_da.data.size()).fill_(source_label).to(device))
@@ -232,76 +329,6 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total.avg, focal_loss_total.avg, loss_adv_total.avg, loss_D_target_total.avg, loss_D_source_total.avg, loss_total.avg))
 
 
-def dast_train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
-
-    source_label = 0
-    target_label = 1
-    total_batches = len(source_loader)
-    target_loader = cycle(target_loader)
-    source_loader = enumerate(source_loader)
-    # pbar = enumerate(zip(source_loader, cycle(target_loader)))
-    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'AdvLoss', 'TotalLoss'))
-    # pbar = tqdm(pbar, total=total_batches, )
-    pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
-    for i, (source_data) in pbar:
-
-        optimizer.zero_grad()
-        optimizer_D.zero_grad()
-
-        # train G
-        # don't accumulate grads in D
-        for param in model_D.parameters():
-            param.requires_grad = False
-
-        # train with source
-        (_, source_input, labels) = source_data
-        (_, target_input, _) = target_loader.__next__()
-        if args.device == 'cuda:0':
-            source_input = source_input.cuda().float()
-            # print('source_inputooooooooooooooooooooo', source_input.shape)
-            labels[0] = labels[0].cuda()
-            labels[1] = labels[1].cuda()
-            target_input = target_input.cuda().float()
-
-        source_feature, source_output = model(source_input, model_D, 'source')
-        # print('ooooooooooooooooooooo',source_output[0].unsqueeze(0).shape)
-        # print('labelsooooooooooooooooooooo', labels[0].shape)
-        source_output = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
-
-        focal_loss, tversky_loss, loss = criterion(source_output, labels)
-        # loss.backward()
-
-        # train with target
-        target_feature, target_output = model(target_input, model_D, 'target')
-        D_out = model_D(target_feature)
-        loss_adv = criterion_bce(D_out, torch.FloatTensor(D_out.data.size()).fill_(source_label).to(args.device))
-
-        loss_adv = loss_adv * 0.1
-        # loss_adv.backward()
-
-        optimizer.step()
-
-        # train D
-        # bring back requires_grad
-        for param in model_D.parameters():
-            param.requires_grad = True
-
-        # train with source
-
-        D_out_source = model_D(source_feature.detach())
-        loss_D_source = criterion_bce(D_out_source, torch.FloatTensor(D_out_source.data.size()).fill_(source_label).to(args.device))
-        loss_D_source.backward()
-
-        # train with target
-
-        D_out_target = model_D(target_feature.detach())
-        loss_D_target = criterion_bce(D_out_target,torch.FloatTensor(D_out_target.data.size()).fill_(target_label).to(args.device))
-        loss_D_target.backward()
-        optimizer_D.step()
-
-        total_loss = loss + loss_adv
-        total_loss.backward()
-        optimizer.step()
 
         pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss_adv, total_loss))

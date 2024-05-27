@@ -49,10 +49,10 @@ def train_net(args):
         model = create_seg_model('b0', 'bdd', False)
 
     if D_pretrained is not None:
-        model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2)])
+        model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2),OutspaceDiscriminator(num_classes=2)])
         model_D.load_state_dict(torch.load(D_pretrained))
     else:
-        model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2)])
+        model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2),OutspaceDiscriminator(num_classes=2)])
     # model_D = FCDiscriminator(num_classes=128)
 
 
