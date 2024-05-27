@@ -67,6 +67,7 @@ def train_net(args):
         model = model.cuda()
         model_D[0] = model_D[0].cuda()
         model_D[1] = model_D[1].cuda()
+        model_D[2] = model_D[2].cuda()
         cudnn.benchmark = True
 
     criteria = TotalLoss(device=args.device)
