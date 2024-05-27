@@ -124,17 +124,23 @@ def poly_lr_scheduler(args, optimizer, epoch, power=2):
 
     return lr
 
-
+loss_total = AverageMeter()
+tversky_loss_total = AverageMeter()
+focal_loss_total = AverageMeter()
+loss_adv_total = AverageMeter()
+loss_D_target_total = AverageMeter()
+loss_D_source_total = AverageMeter()
 def train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
     device = args.device
     source_label = 0
     target_label = 1
-    loss_total = AverageMeter()
-    tversky_loss_total = AverageMeter()
-    focal_loss_total = AverageMeter()
-    loss_adv_total = AverageMeter()
-    loss_D_target_total = AverageMeter()
-    loss_D_source_total = AverageMeter()
+
+    loss_total.reset()
+    tversky_loss_total.reset()
+    focal_loss_total.reset()
+    loss_adv_total.reset()
+    loss_D_target_total.reset()
+    loss_D_source_total.reset()
 
     criterion_bce = torch.nn.MSELoss()
 
@@ -146,7 +152,6 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
-
         optimizer.zero_grad()
         optimizer_D.zero_grad()
 
@@ -233,12 +238,6 @@ def train(args, source_loader, target_loader, model,model_D, criterion, criterio
         pbar.set_description(('%13s' * 1 + '%13.4g' * 6) %
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total.avg, focal_loss_total.avg, loss_adv_total.avg, loss_D_target_total.avg, loss_D_source_total.avg, loss_total.avg))
 
-        loss_total.reset()
-        tversky_loss_total.reset()
-        focal_loss_total.reset()
-        loss_adv_total.reset()
-        loss_D_target_total.reset()
-        loss_D_source_total.reset()
 
 def dast_train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, optimizer, optimizer_D, epoch):
 
