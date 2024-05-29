@@ -258,7 +258,7 @@ def dast_train(args, source_loader, target_loader, model,model_D, criterion, cri
     device = args.device
 
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
-    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'AdvLoss', 'TotalLoss'))
+    LOGGER.info(('\n' + '%13s' * 7) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'AdvLoss', 'loss_D_target', 'loss_D_source', 'TotalLoss'))
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
