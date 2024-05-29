@@ -258,7 +258,7 @@ def dast_train(args, source_loader, target_loader, model,model_D, criterion, cri
     device = args.device
 
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
-    LOGGER.info(('\n' + '%13s' * 7) % ('Epoch', 'TverskyLoss', 'FocalLoss', 'AdvLoss', 'loss_D_target', 'loss_D_source', 'TotalLoss'))
+    LOGGER.info(('\n' + '%13s' * 5) % ('Epoch', 'AdvLoss', 'loss_D_target', 'loss_D_source', 'TotalLoss'))
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
@@ -347,13 +347,12 @@ def dast_train(args, source_loader, target_loader, model,model_D, criterion, cri
         loss_D_target.backward()
 
         optimizer_D.step()
-        pbar.set_description(('%13s' * 1 + '%13.4g' * 6) %
-                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total.avg, focal_loss_total.avg, loss_adv_total.avg, loss_D_target_total.avg, loss_D_source_total.avg, loss_total.avg))
-
-
-
         pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
-                             (f'{epoch}/{args.max_epochs - 1}', tversky_loss, focal_loss, loss_adv, total_loss))
+                             (f'{epoch}/{args.max_epochs - 1}', loss_adv_total.avg, loss_D_target_total.avg, loss_D_source_total.avg, loss_total.avg))
+
+
+
+
 
 
 @torch.no_grad()
