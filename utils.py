@@ -294,16 +294,18 @@ def dast_train(args, source_loader, target_loader, model,model_D, criterion, cri
         D_out_da = model_D[1](F.softmax(target_output[0], dim=1))
         D_out_ll = model_D[1](F.softmax(target_output[1], dim=1))
 
-        loss_adv_da = criterion_bce2(D_out_da, torch.FloatTensor(D_out_da.data.size()).fill_(source_label).to(device))
-        loss_adv_ll = criterion_bce2(D_out_ll, torch.FloatTensor(D_out_ll.data.size()).fill_(source_label).to(device))
+        loss_adv_da = criterion_bce(D_out_da, torch.FloatTensor(D_out_da.data.size()).fill_(source_label).to(device))
+        loss_adv_ll = criterion_bce(D_out_ll, torch.FloatTensor(D_out_ll.data.size()).fill_(source_label).to(device))
 
         loss_adv = loss_adv_da * 0.1 + loss_adv_ll * 0.1 + loss_adv1 * 0.1
         loss_adv_total.update(loss_adv,args.batch_size)
         total_loss = loss + loss_adv
+
         segloss.update(loss,args.batch_size)
         tversky_loss_total.update(tversky_loss,args.batch_size)
         focal_loss_total.update(focal_loss,args.batch_size)
         loss_total.update(total_loss,args.batch_size)
+
         total_loss.backward()
         optimizer.step()
 
