@@ -160,14 +160,14 @@ class MyDataset(torch.utils.data.Dataset):
         elif self.data == 'IADD':
             if self.engin == 'kaggle':  #IADD dataset on kaggle engine
                 if valid:
-                    self.root = '/kaggle/working/IADD/IADD.v7i.coco-segmentation/val/img'
+                    self.root = '/kaggle/working/IADD/IADD.v7i.coco-segmentation/valid/img'
                     self.names = os.listdir(self.root)
                 else:
                     self.root = '/kaggle/working/IADD/IADD.v7i.coco-segmentation/train/img'
                     self.names = os.listdir(self.root)[:1000]
             else:                        #IADD dataset on colab engine
                 if valid:
-                    self.root = '/content/IADD/IADD.v7i.coco-segmentation/val/img'
+                    self.root = '/content/IADD/IADD.v7i.coco-segmentation/valid/img'
                     self.names = os.listdir(self.root)
                 else:
                     self.root = '/content/IADD/IADD.v7i.coco-segmentation/train/img'

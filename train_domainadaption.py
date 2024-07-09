@@ -122,7 +122,6 @@ def train_net(args):
 
         checkpoint_file_name = args.savedir + os.sep + 'checkpoint_{}.pth.tar'.format(epoch)
         poly_lr_scheduler(args, optimizer, epoch)
-        poly_lr_scheduler(args, optimizer_D, epoch)
         for param_group in optimizer.param_groups:
             lr = param_group['lr']
         print("Learning rate: " + str(lr))
@@ -132,16 +131,15 @@ def train_net(args):
             train(args, source_loader, model,  criteria, optimizer,epoch)
 
         elif args.data == 'IADD':
-            criteria_bce2 = torch.nn.MSELoss(reduce=False, reduction='none')
+            # criteria_bce2 = torch.nn.MSELoss(reduce=False, reduction='none')
             valid(model, iadd_valLoader)
-            dast_train(args,target_loader, model, criteria, optimizer, epoch)
+            train(args,target_loader, model, criteria, optimizer, epoch)
 
 
         # valid(model, iadd_valLoader)
         # valid(model, bdd_valLoader)
 
         torch.save(model.state_dict(), model_file_name)
-        torch.save(model_D.state_dict(), model_D_file_name)
 
         save_checkpoint({
             'epoch': epoch + 1,
