@@ -161,7 +161,7 @@ def train(args, source_loader, target_loader, model, criterion,  optimizer, epoc
             labels[1] = labels[1].cuda()
             target_input = target_input.cuda().float()
 
-        source_feature, source_output = model(source_input)
+        source_output = model(source_input)
         source_output_resized = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
 
         focal_loss, tversky_loss, loss = criterion(source_output_resized, labels)
@@ -321,7 +321,7 @@ def val(val_loader, model):
         target_var = target
 
         with torch.no_grad():
-            _, output = model(input_var)
+            output = model(input_var)
             # output = model(input_var)
             output = (resize(output[0], [512, 512]), resize(output[1], [512, 512]))
 
