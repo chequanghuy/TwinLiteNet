@@ -173,7 +173,7 @@ def train(args, data_loader, model, criterion,  optimizer, epoch):
         # train with target
 
         optimizer.step()
-        pbar.set_description(('%13s' * 1 + '%13.4g' * 6) %
+        pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total.avg, focal_loss_total.avg, loss_total.avg))
 
 
