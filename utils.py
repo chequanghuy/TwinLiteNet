@@ -130,7 +130,7 @@ focal_loss_total = AverageMeter()
 loss_adv_total = AverageMeter()
 loss_D_target_total = AverageMeter()
 loss_D_source_total = AverageMeter()
-def train(args, source_loader, target_loader, model, criterion,  optimizer, epoch):
+def train(args, data_loader, model, criterion,  optimizer, epoch):
     device = args.device
     source_label = 0
     target_label = 1
@@ -142,9 +142,9 @@ def train(args, source_loader, target_loader, model, criterion,  optimizer, epoc
 
     criterion_bce = torch.nn.MSELoss()
 
-    total_batches = len(source_loader)
-    target_loader = cycle(target_loader)
-    source_loader = enumerate(source_loader)
+    total_batches = len(data_loader)
+    # target_loader = cycle(target_loader)
+    source_loader = enumerate(data_loader)
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
     LOGGER.info(('\n' + '%13s' * 7) % ('Epoch', 'TverskyLoss', 'FocalLoss',  'Total Loss' ))
     # pbar = tqdm(pbar, total=total_batches, )
@@ -154,12 +154,12 @@ def train(args, source_loader, target_loader, model, criterion,  optimizer, epoc
 
         # train with source
         (_, source_input, labels) = source_data
-        (_, target_input, _) = target_loader.__next__()
+        # (_, target_input, _) = target_loader.__next__()
         if args.device == 'cuda:0':
             source_input = source_input.cuda().float()
             labels[0] = labels[0].cuda()
             labels[1] = labels[1].cuda()
-            target_input = target_input.cuda().float()
+            # target_input = target_input.cuda().float()
 
         source_output = model(source_input)
         source_output_resized = (resize(source_output[0], [512, 512]), resize(source_output[1], [512, 512]))
