@@ -95,7 +95,6 @@ def train_net(args):
     lr = args.lr
 
     optimizer = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
-    optimizer_d = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
 
     # model.head1 = copy.deepcopy(head).cuda()
     # model.head2 = copy.deepcopy(head).cuda()

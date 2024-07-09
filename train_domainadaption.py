@@ -48,12 +48,12 @@ def train_net(args):
     else:
         model = create_seg_model('b0', 'bdd', False)
 
-    if D_pretrained is not None:
-        model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2),OutspaceDiscriminator(num_classes=2)])
-        model_D.load_state_dict(torch.load(D_pretrained))
-    else:
-        model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2),OutspaceDiscriminator(num_classes=2)])
-    # model_D = FCDiscriminator(num_classes=128)
+    # if D_pretrained is not None:
+    #     model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2),OutspaceDiscriminator(num_classes=2)])
+    #     model_D.load_state_dict(torch.load(D_pretrained))
+    # else:
+    #     model_D = nn.ModuleList([FCDiscriminator(num_classes=128),OutspaceDiscriminator(num_classes=2),OutspaceDiscriminator(num_classes=2)])
+    # # model_D = FCDiscriminator(num_classes=128)
 
 
     args.savedir = args.savedir + '/'
@@ -65,29 +65,25 @@ def train_net(args):
     if cuda_available:
         args.onGPU = True
         model = model.cuda()
-        model_D[0] = model_D[0].cuda()
-        model_D[1] = model_D[1].cuda()
-        model_D[2] = model_D[2].cuda()
+
         cudnn.benchmark = True
 
     criteria = TotalLoss(device=args.device)
     criteria_bce = torch.nn.MSELoss().to(args.device)
     start_epoch = 0
     lr = args.lr
-    lr_D = args.lr / 4
+    # lr_D = args.lr / 4
 
     optimizer = torch.optim.Adam(model.parameters(), lr, (0.9, 0.999), eps=1e-08, weight_decay=5e-4)
-    optimizer_D = torch.optim.Adam(model_D.parameters(), lr=lr, betas=(0.9, 0.99), eps=1e-08, weight_decay=5e-4)
 
     optimizer.zero_grad()
-    optimizer_D.zero_grad()
 
     input_size = [512, 512]
     input_size_target = [512, 512]
 
 
-    interp = nn.Upsample(size=(input_size[1], input_size[0]), mode='bilinear', align_corners=True)
-    interp_target = nn.Upsample(size=(input_size_target[1], input_size_target[0]), mode='bilinear', align_corners=True)
+    # interp = nn.Upsample(size=(input_size[1], input_size[0]), mode='bilinear', align_corners=True)
+    # interp_target = nn.Upsample(size=(input_size_target[1], input_size_target[0]), mode='bilinear', align_corners=True)
 
     if args.resume:
         if os.path.isfile(args.resume):
@@ -131,12 +127,15 @@ def train_net(args):
             lr = param_group['lr']
         print("Learning rate: " + str(lr))
         # train for one epoch
-        if args.mode == 'DA':
-            train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, optimizer, optimizer_D,
-                  epoch)
-        elif args.mode == 'DAST':
+        if args.data == 'bdd':
+            valid(model, bdd_valLoader)
+            train(args, source_loader, model,  criteria, optimizer,epoch)
+
+        elif args.data == 'IADD':
             criteria_bce2 = torch.nn.MSELoss(reduce=False, reduction='none')
-            dast_train(args, source_loader, target_loader, model, model_D, criteria, criteria_bce, criteria_bce2, optimizer, optimizer_D, epoch)
+            valid(model, iadd_valLoader)
+            dast_train(args,target_loader, model, criteria, optimizer, epoch)
+
 
         # valid(model, iadd_valLoader)
         # valid(model, bdd_valLoader)
@@ -150,9 +149,6 @@ def train_net(args):
             'optimizer': optimizer.state_dict(),
             'lr': lr
         }, checkpoint_file_name)
-
-        valid(model, iadd_valLoader)
-        valid(model, bdd_valLoader)
 
 
 if __name__ == '__main__':
@@ -170,6 +166,6 @@ if __name__ == '__main__':
     parser.add_argument('--dpretrained', default=None, help='Pretrained ESPNetv2 weights.')
     parser.add_argument('--pseudo', default=True, help='Pretrained ESPNetv2 weights.')
     parser.add_argument('--engine', default='kaggle', help='choose youre prefered engine, kaggle or colab.')
-    parser.add_argument('--mode', default='DA', help='DA mode or DAST mode?.')
+    parser.add_argument('--data', default='bdd', help='DA mode or DAST mode?.')
 
     train_net(parser.parse_args())
