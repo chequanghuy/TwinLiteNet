@@ -146,7 +146,7 @@ def train(args, data_loader, model, criterion,  optimizer, epoch):
     # target_loader = cycle(target_loader)
     source_loader = enumerate(data_loader)
     # pbar = enumerate(zip(source_loader, cycle(target_loader)))
-    LOGGER.info(('\n' + '%13s' * 7) % ('Epoch', 'TverskyLoss', 'FocalLoss',  'Total Loss' ))
+    LOGGER.info(('\n' + '%13s' * 4) % ('Epoch', 'TverskyLoss', 'FocalLoss',  'Total Loss' ))
     # pbar = tqdm(pbar, total=total_batches, )
     pbar = (tqdm(source_loader, total=total_batches, bar_format='{l_bar}{bar:10}{r_bar}'))
     for i, (source_data) in pbar:
@@ -173,7 +173,7 @@ def train(args, data_loader, model, criterion,  optimizer, epoch):
         # train with target
 
         optimizer.step()
-        pbar.set_description(('%13s' * 1 + '%13.4g' * 4) %
+        pbar.set_description(('%13s' * 1 + '%13.4g' * 3) %
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total.avg, focal_loss_total.avg, loss_total.avg))
 
 
