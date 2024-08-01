@@ -136,9 +136,6 @@ def train_net(args):
             train(args,target_loader, model, criteria, optimizer, epoch)
 
 
-        # valid(model, iadd_valLoader)
-        # valid(model, bdd_valLoader)
-
         torch.save(model.state_dict(), model_file_name)
 
         save_checkpoint({

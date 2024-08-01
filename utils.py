@@ -139,9 +139,6 @@ def train(args, data_loader, model, criterion,  optimizer, epoch):
     tversky_loss_total.reset()
     focal_loss_total.reset()
 
-
-    criterion_bce = torch.nn.MSELoss()
-
     total_batches = len(data_loader)
     # target_loader = cycle(target_loader)
     source_loader = enumerate(data_loader)
@@ -177,7 +174,7 @@ def train(args, data_loader, model, criterion,  optimizer, epoch):
                              (f'{epoch}/{args.max_epochs - 1}', tversky_loss_total.avg, focal_loss_total.avg, loss_total.avg))
 
 
-def dast_train(args, source_loader, target_loader, model,model_D, criterion, criterion_bce, criterion_bce2, optimizer, optimizer_D, epoch):
+def dast_train(args, tra, model, criterion, criterion_bce2, optimizer, optimizer_D, epoch):
 
     source_label = 0
     target_label = 1
