@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7e27571b-ca55-4a02-ae51-2758e7b03021" name="Changes" comment="change pbar">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_7_9_2024_11_17_AM_[Changes]1/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_7_9_2024_11_17_AM__Changes_1.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train_domainadaption.py" beforeDir="false" afterPath="$PROJECT_DIR$/train_domainadaption.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +33,9 @@
     &quot;assignee&quot;: &quot;kimik76&quot;
   }
 }</component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="c41fae36-3041-4477-ac7a-fff3cff2e008" />
+  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/kimik76/TwinLiteNet.git&quot;,
@@ -51,17 +50,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.Discriminator.executor&quot;: &quot;Run&quot;,
-    &quot;Python.inference.executor&quot;: &quot;Run&quot;,
-    &quot;Python.loss.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;fine-tune&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/study/semester4/YOLOP-main/YOLOP-main&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.Discriminator.executor": "Run",
+    "Python.inference.executor": "Run",
+    "Python.loss.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "fine-tune",
+    "last_opened_file_path": "D:/study/semester4/YOLOP-main/YOLOP-main",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\acer\Desktop\TwinLiteNet" />
@@ -162,14 +161,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1714381415492</updated>
-    </task>
-    <task id="LOCAL-00071" summary="change pbar">
-      <option name="closed" value="true" />
-      <created>1715760618765</created>
-      <option name="number" value="00071" />
-      <option name="presentableId" value="LOCAL-00071" />
-      <option name="project" value="LOCAL" />
-      <updated>1715760618765</updated>
     </task>
     <task id="LOCAL-00072" summary="change pbar">
       <option name="closed" value="true" />
@@ -555,7 +546,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717016966772</updated>
     </task>
-    <option name="localTasksCounter" value="120" />
+    <task id="LOCAL-00120" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1722497615653</created>
+      <option name="number" value="00120" />
+      <option name="presentableId" value="LOCAL-00120" />
+      <option name="project" value="LOCAL" />
+      <updated>1722497615653</updated>
+    </task>
+    <option name="localTasksCounter" value="121" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
