@@ -47,7 +47,7 @@ class iouEval:
         mIOU = self.mIOU / self.batchCount
 
         return overall_acc, per_class_acc, per_class_iu, mIOU
-    
+
 
 class SegmentationMetric(object):
     '''
@@ -55,16 +55,20 @@ class SegmentationMetric(object):
     confusionMatrix [[0(TN),1(FP)],
                      [2(FN),3(TP)]]
     '''
+
     def __init__(self, numClass):
         self.numClass = numClass
-        self.confusionMatrix = np.zeros((self.numClass,)*2)
+        self.confusionMatrix = np.zeros((self.numClass,) * 2)
 
     def pixelAccuracy(self):
         # return all class overall pixel accuracy
         # acc = (TP + TN) / (TP + TN + FP + TN)
-        acc = np.diag(self.confusionMatrix).sum() /  self.confusionMatrix.sum()
+        acc = np.diag(self.confusionMatrix).sum() / self.confusionMatrix.sum()
         return acc
-        
+
+    def lineAccuracy(self):
+        Acc = np.diag(self.confusionMatrix) / (self.confusionMatrix.sum(axis=1) + 1e-12)
+        return Acc[1]
 
     def classPixelAccuracy(self):
         # return each category pixel accuracy(A more accurate way to call it precision)
@@ -81,15 +85,17 @@ class SegmentationMetric(object):
         # Intersection = TP Union = TP + FP + FN
         # IoU = TP / (TP + FP + FN)
         intersection = np.diag(self.confusionMatrix)
-        union = np.sum(self.confusionMatrix, axis=1) + np.sum(self.confusionMatrix, axis=0) - np.diag(self.confusionMatrix)
+        union = np.sum(self.confusionMatrix, axis=1) + np.sum(self.confusionMatrix, axis=0) - np.diag(
+            self.confusionMatrix)
         IoU = intersection / union
         IoU[np.isnan(IoU)] = 0
         mIoU = np.nanmean(IoU)
         return mIoU
-    
+
     def IntersectionOverUnion(self):
         intersection = np.diag(self.confusionMatrix)
-        union = np.sum(self.confusionMatrix, axis=1) + np.sum(self.confusionMatrix, axis=0) - np.diag(self.confusionMatrix)
+        union = np.sum(self.confusionMatrix, axis=1) + np.sum(self.confusionMatrix, axis=0) - np.diag(
+            self.confusionMatrix)
         IoU = intersection / union
         IoU[np.isnan(IoU)] = 0
         return IoU[1]
@@ -99,7 +105,7 @@ class SegmentationMetric(object):
         # print(imgLabel.shape)
         mask = (imgLabel >= 0) & (imgLabel < self.numClass)
         label = self.numClass * imgLabel[mask] + imgPredict[mask]
-        count = np.bincount(label, minlength=self.numClass**2)
+        count = np.bincount(label, minlength=self.numClass ** 2)
         confusionMatrix = count.reshape(self.numClass, self.numClass)
         return confusionMatrix
 
@@ -111,7 +117,6 @@ class SegmentationMetric(object):
                 np.diag(self.confusionMatrix))
         FWIoU = (freq[freq > 0] * iu[freq > 0]).sum()
         return FWIoU
-
 
     def addBatch(self, imgPredict, imgLabel):
         assert imgPredict.shape == imgLabel.shape
