@@ -459,10 +459,10 @@ class TwinLiteNet(nn.Module):
         
         
 
-        x2=self.up_1_2(x)
-        x2=self.up_2_2(x2)
-        classifier2=self.classifier_2(x2)
+#        x2=self.up_1_2(x)
+ #       x2=self.up_2_2(x2)
+  #      classifier2=self.classifier_2(x2)
 
-        return (classifier1,classifier2)
+        return (classifier1)
 
 
