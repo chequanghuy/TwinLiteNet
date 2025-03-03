@@ -1,7 +1,7 @@
 # TwinLiteNet: Efficient and Lightweight Model for Drivable Area & Lane Segmentation
 
 🚀 **BREAKING NEWS! TwinLiteNetPlus has been officially released!** 🚀  
-Check it out now at [![arXiv](https://img.shields.io/badge/arXiv-2502.12524-b31b1b.svg)](https://arxiv.org/abs/2403.16958) [![GitHub](https://img.shields.io/badge/GitHub-Repo-black?logo=github)]([https://github.com/your-repo-link](https://github.com/chequanghuy/TwinLiteNetPlus)) for enhanced performance and new features! 🎉🔥
+Check it out now at [![arXiv](https://img.shields.io/badge/arXiv-2502.12524-b31b1b.svg)](https://arxiv.org/abs/2403.16958) [![GitHub](https://img.shields.io/badge/GitHub-Repo-black?logo=github)](https://github.com/chequanghuy/TwinLiteNetPlus) for enhanced performance and new features! 🎉🔥
 
 TwinLiteNet is a lightweight and efficient deep learning model designed for **Drivable Area Segmentation** and **Lane Detection** in self-driving cars. This repository provides the code and resources needed to train, evaluate, and deploy TwinLiteNet.
 
