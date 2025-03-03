@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7e27571b-ca55-4a02-ae51-2758e7b03021" name="Changes" comment="change pbar">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="MMD-adaption" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;kimik76&quot;
+  }
+}</component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="c41fae36-3041-4477-ac7a-fff3cff2e008" />
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/kimik76/TwinLiteNet.git&quot;,
+    &quot;accountId&quot;: &quot;c41fae36-3041-4477-ac7a-fff3cff2e008&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2flh8oWpYhEtfkCZoqUX9IiXkZw" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.Discriminator.executor": "Run",
+    "Python.inference.executor": "Run",
+    "Python.loss.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "fine-tune",
+    "last_opened_file_path": "D:/study/semester4/YOLOP-main/YOLOP-main",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\acer\Desktop\TwinLiteNet" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\acer\Desktop\TwinLiteNet" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.Discriminator">
+    <configuration name="Discriminator" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="TwinLiteNet" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/model" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/model/Discriminator.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="inference" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="TwinLiteNet" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/inference.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="loss" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="TwinLiteNet" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/loss.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.Discriminator" />
+        <item itemvalue="Python.loss" />
+        <item itemvalue="Python.inference" />
+        <item itemvalue="Python.Discriminator" />
+        <item itemvalue="Python.loss" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-0509580d9d50-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.14494.241" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7e27571b-ca55-4a02-ae51-2758e7b03021" name="Changes" comment="" />
+      <created>1714381415492</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1714381415492</updated>
+    </task>
+    <task id="LOCAL-00072" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715760666841</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1715760666841</updated>
+    </task>
+    <task id="LOCAL-00073" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715760787315</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1715760787315</updated>
+    </task>
+    <task id="LOCAL-00074" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715761021116</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1715761021116</updated>
+    </task>
+    <task id="LOCAL-00075" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715761168024</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1715761168024</updated>
+    </task>
+    <task id="LOCAL-00076" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715761834458</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1715761834458</updated>
+    </task>
+    <task id="LOCAL-00077" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715765940654</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1715765940656</updated>
+    </task>
+    <task id="LOCAL-00078" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715768479572</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1715768479572</updated>
+    </task>
+    <task id="LOCAL-00079" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715768814214</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1715768814214</updated>
+    </task>
+    <task id="LOCAL-00080" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715769188282</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1715769188282</updated>
+    </task>
+    <task id="LOCAL-00081" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715774293223</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1715774293223</updated>
+    </task>
+    <task id="LOCAL-00082" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1715780435878</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1715780435878</updated>
+    </task>
+    <task id="LOCAL-00083" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716296823277</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1716296823277</updated>
+    </task>
+    <task id="LOCAL-00084" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716299164058</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1716299164058</updated>
+    </task>
+    <task id="LOCAL-00085" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716299291839</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1716299291839</updated>
+    </task>
+    <task id="LOCAL-00086" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716299563764</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1716299563764</updated>
+    </task>
+    <task id="LOCAL-00087" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716299652248</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1716299652248</updated>
+    </task>
+    <task id="LOCAL-00088" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716299809283</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1716299809283</updated>
+    </task>
+    <task id="LOCAL-00089" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716300073584</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1716300073587</updated>
+    </task>
+    <task id="LOCAL-00090" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716300295498</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1716300295498</updated>
+    </task>
+    <task id="LOCAL-00091" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716300630656</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1716300630656</updated>
+    </task>
+    <task id="LOCAL-00092" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716300709360</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1716300709360</updated>
+    </task>
+    <task id="LOCAL-00093" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716300758476</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1716300758476</updated>
+    </task>
+    <task id="LOCAL-00094" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716301214110</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1716301214110</updated>
+    </task>
+    <task id="LOCAL-00095" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716301292344</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1716301292344</updated>
+    </task>
+    <task id="LOCAL-00096" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716320976169</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1716320976170</updated>
+    </task>
+    <task id="LOCAL-00097" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716325752512</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1716325752512</updated>
+    </task>
+    <task id="LOCAL-00098" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716450754361</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1716450754361</updated>
+    </task>
+    <task id="LOCAL-00099" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716453167266</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1716453167267</updated>
+    </task>
+    <task id="LOCAL-00100" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716453370496</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1716453370497</updated>
+    </task>
+    <task id="LOCAL-00101" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716455171107</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1716455171107</updated>
+    </task>
+    <task id="LOCAL-00102" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716718564206</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1716718564208</updated>
+    </task>
+    <task id="LOCAL-00103" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716718658199</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1716718658199</updated>
+    </task>
+    <task id="LOCAL-00104" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716728445007</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1716728445007</updated>
+    </task>
+    <task id="LOCAL-00105" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716729611209</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1716729611209</updated>
+    </task>
+    <task id="LOCAL-00106" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716729725247</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1716729725247</updated>
+    </task>
+    <task id="LOCAL-00107" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716731067134</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1716731067134</updated>
+    </task>
+    <task id="LOCAL-00108" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716731087287</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1716731087287</updated>
+    </task>
+    <task id="LOCAL-00109" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716731243547</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1716731243547</updated>
+    </task>
+    <task id="LOCAL-00110" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716731288723</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1716731288723</updated>
+    </task>
+    <task id="LOCAL-00111" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716731387603</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1716731387603</updated>
+    </task>
+    <task id="LOCAL-00112" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716731792867</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1716731792867</updated>
+    </task>
+    <task id="LOCAL-00113" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716792301020</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1716792301020</updated>
+    </task>
+    <task id="LOCAL-00114" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716809191434</created>
+      <option name="number" value="00114" />
+      <option name="presentableId" value="LOCAL-00114" />
+      <option name="project" value="LOCAL" />
+      <updated>1716809191434</updated>
+    </task>
+    <task id="LOCAL-00115" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716809442496</created>
+      <option name="number" value="00115" />
+      <option name="presentableId" value="LOCAL-00115" />
+      <option name="project" value="LOCAL" />
+      <updated>1716809442497</updated>
+    </task>
+    <task id="LOCAL-00116" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716881654354</created>
+      <option name="number" value="00116" />
+      <option name="presentableId" value="LOCAL-00116" />
+      <option name="project" value="LOCAL" />
+      <updated>1716881654355</updated>
+    </task>
+    <task id="LOCAL-00117" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716973143430</created>
+      <option name="number" value="00117" />
+      <option name="presentableId" value="LOCAL-00117" />
+      <option name="project" value="LOCAL" />
+      <updated>1716973143430</updated>
+    </task>
+    <task id="LOCAL-00118" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1716986451550</created>
+      <option name="number" value="00118" />
+      <option name="presentableId" value="LOCAL-00118" />
+      <option name="project" value="LOCAL" />
+      <updated>1716986451550</updated>
+    </task>
+    <task id="LOCAL-00119" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1717016966772</created>
+      <option name="number" value="00119" />
+      <option name="presentableId" value="LOCAL-00119" />
+      <option name="project" value="LOCAL" />
+      <updated>1717016966772</updated>
+    </task>
+    <task id="LOCAL-00120" summary="change pbar">
+      <option name="closed" value="true" />
+      <created>1722497615653</created>
+      <option name="number" value="00120" />
+      <option name="presentableId" value="LOCAL-00120" />
+      <option name="project" value="LOCAL" />
+      <updated>1722497615653</updated>
+    </task>
+    <option name="localTasksCounter" value="121" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="build_1" />
+    <MESSAGE value="chert_update" />
+    <MESSAGE value="change pbar" />
+    <option name="LAST_COMMIT_MESSAGE" value="change pbar" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/loss.py</url>
+          <line>51</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
