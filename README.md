@@ -40,7 +40,7 @@ pip install -r requirements.txt
 
 ## Train
 ```python
-python3 main.py
+python3 train.py
 ```
 
 ## Test
