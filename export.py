@@ -122,7 +122,7 @@ def run(
         device='',
         include=[]
     ):
-    model = net.Net()
+    model = Net()
     model = model.cuda()
     model.load_state_dict(torch.load(weights))
     device = select_device(device)
