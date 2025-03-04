@@ -53,7 +53,7 @@ pip install -r requirements.txt
 ## 🔥 Training
 Train the model using the command:
 ```bash
-python3 main.py
+python3 train.py
 ```
 
 ---
