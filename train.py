@@ -70,13 +70,16 @@ def train_net(args):
         for param_group in optimizer.param_groups:
             lr = param_group['lr']
         print("Learning rate: " +  str(lr))
-
+        
         # train for one epoch
         model.train()
         train( args, trainLoader, model, criteria, optimizer, epoch)
         model.eval()
         # validation
-        val(valLoader, model)
+        da_segment_results,ll_segment_results = val(valLoader, model)
+
+        print(f"Driving Area Segment: mIOU({da_segment_results[2]:.3f})")
+        print(f"Lane Line Segment: Acc({ll_segment_results[0]:.3f}) IOU({ll_segment_results[1]:.3f})")
         torch.save(model.state_dict(), model_file_name)
         
         save_checkpoint({
