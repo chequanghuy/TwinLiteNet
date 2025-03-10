@@ -164,7 +164,7 @@ def val(val_loader, model):
         LL.addBatch(ll_predict.cpu(), ll_gt.cpu())
 
 
-        ll_acc = LL.pixelAccuracy()
+        ll_acc = LL.lineAccuracy()
         ll_IoU = LL.IntersectionOverUnion()
         ll_mIoU = LL.meanIntersectionOverUnion()
 
